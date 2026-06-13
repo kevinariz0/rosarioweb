@@ -201,9 +201,203 @@
     .card-header, .intro-header { padding: 16px 15px 13px; }
     .verses-block, .prayer-block, .pesame-block, .reflection-block { padding: 14px 14px; }
   }
+
+  /* ===== MEJORAS: toolbar, modo oración, desplegables, imágenes, contador, progreso ===== */
+  .floating-toolbar {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 500;
+    display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+    padding: 10px 12px; background: rgba(16,10,30,0.92);
+    border-top: 1px solid rgba(201,168,76,0.35); backdrop-filter: blur(6px);
+  }
+  .tb-btn {
+    font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.08em;
+    padding: 8px 14px; border: 1px solid rgba(201,168,76,0.4);
+    background: rgba(201,168,76,0.07); color: var(--gold-light);
+    cursor: pointer; border-radius: 20px; transition: all 0.25s ease;
+    text-transform: uppercase; display: flex; align-items: center; gap: 6px;
+  }
+  .tb-btn:hover, .tb-btn.on { background: rgba(201,168,76,0.22); color: var(--gold); border-color: var(--gold); box-shadow: 0 0 14px rgba(201,168,76,0.25); }
+  .tb-counter-num { font-family: 'Cinzel Decorative', serif; font-size: 0.95rem; color: var(--gold); min-width: 1.4em; text-align: center; }
+  .main { padding-bottom: 90px; }
+
+  /* Modo Oscuro: oscurece y simplifica decoración, pero NO bloquea la navegación ni cambia el tamaño de letra */
+  body.modo-oracion::after, body.modo-oracion .cross-ornament,
+  body.modo-oracion .mystery-image, body.modo-oracion .group-header::before,
+  body.modo-oracion .group-header::after, body.modo-oracion .divider-gem,
+  body.modo-oracion .mystery-number, body.modo-oracion .intro-icon {
+    opacity: 0; visibility: hidden; height: 0; overflow: hidden;
+  }
+  body.modo-oracion { background: #000; }
+  body.modo-oracion::before { opacity: 0.3; }
+  body.modo-oracion .oracion-texto, body.modo-oracion .verse-text,
+  body.modo-oracion .explanation, body.modo-oracion .prayer-text,
+  body.modo-oracion .pesame-text, body.modo-oracion .reflection-text,
+  body.modo-oracion .latin-text {
+    line-height: 2;
+  }
+  body.modo-oracion .mystery-card, body.modo-oracion .rosario-intro, body.modo-oracion .rosario-fin {
+    border-color: rgba(201,168,76,0.4);
+  }
+  body.modo-oracion .group-header { padding: 16px 10px; margin-bottom: 18px; }
+  body.modo-oracion .hero { padding: 18px 16px 10px; }
+  body.modo-oracion .hero h1 { font-size: 1.3rem; }
+  body.modo-oracion .hero .subtitle { display:none; }
+  body.modo-oracion .divider { margin: 8px auto; }
+  /* La barra de pestañas se mantiene usable, solo más discreta */
+  body.modo-oracion .nav-tabs { opacity: 0.55; }
+  body.modo-oracion .nav-tabs:hover, body.modo-oracion .nav-tabs:focus-within { opacity: 1; }
+
+  /* Tamaño de letra ajustable (independiente del modo oscuro) */
+  html.font-lg { font-size: 113%; }
+  html.font-xl { font-size: 127%; }
+
+
+  /* Desplegables */
+  details.toggle-block { margin: 0 0 18px; }
+  details.toggle-block > summary.section-label {
+    cursor: pointer; list-style: none; margin-bottom: 0; padding: 10px 0;
+    user-select: none;
+  }
+  details.toggle-block > summary.section-label::-webkit-details-marker { display: none; }
+  details.toggle-block > summary.section-label::before {
+    content: '▸'; color: var(--gold); margin-right: 4px; display: inline-block;
+    transition: transform 0.25s ease; flex-shrink: 0;
+  }
+  details.toggle-block[open] > summary.section-label::before { transform: rotate(90deg); }
+  details.toggle-block[open] > summary.section-label { margin-bottom: 4px; }
+  details.toggle-block > summary.section-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(201,168,76,0.38), transparent); }
+  details.toggle-block .explanation, details.toggle-block .reflection-block { margin-top: 4px; }
+  details.toggle-block .verses-block { margin-top: 4px; }
+
+  /* Imágenes sacras */
+  .mystery-image { width: 100%; line-height: 0; border-bottom: 1px solid rgba(201,168,76,0.18); background: #000; }
+  .mystery-image img { width: 100%; max-height: 320px; object-fit: cover; display: block; filter: sepia(18%) saturate(85%) brightness(0.92); opacity: 0.92; }
+  .mystery-image .img-cred { display:none; }
+
+  /* Tracker de decenas */
+  .tracker-label {
+    text-align: center; font-size: 0.74rem; color: rgba(201,168,76,0.6);
+    font-style: italic; margin-top: 14px; letter-spacing: 0.03em;
+  }
+  .decade-tracker { display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+  .decade-dot {
+    font-family: 'Cinzel', serif; font-size: 0.78rem; width: 34px; height: 34px;
+    border: 1px solid rgba(201,168,76,0.4); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gold-light); cursor: pointer; transition: all 0.25s ease; background: rgba(201,168,76,0.04);
+  }
+  .decade-dot:hover { border-color: var(--gold); }
+  .decade-dot.current { background: var(--gold); color: var(--deep); border-color: var(--gold); box-shadow: 0 0 14px rgba(201,168,76,0.5); font-weight: 700; }
+
+  /* Resaltado al saltar a un misterio */
+  @keyframes highlight-jump-anim {
+    0%, 100% { box-shadow: none; border-color: rgba(201,168,76,0.18); }
+    30% { box-shadow: 0 0 28px rgba(201,168,76,0.55); border-color: var(--gold); }
+  }
+  .mystery-card.highlight-jump { animation: highlight-jump-anim 1.4s ease; }
+
+  /* Promesas */
+  .promise-list { counter-reset: promesa; }
+  .promise-item {
+    display: flex; gap: 16px; align-items: flex-start; margin-bottom: 18px;
+    padding-bottom: 18px; border-bottom: 1px solid rgba(201,168,76,0.1);
+  }
+  .promise-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .promise-num {
+    counter-increment: promesa; content: counter(promesa);
+    font-family: 'Cinzel Decorative', serif; font-size: 1.4rem; color: var(--gold);
+    opacity: 0.6; min-width: 38px; text-align: center;
+  }
+  .promise-num::before { content: counter(promesa); }
+  .promise-text { font-size: 1rem; line-height: 1.8; color: rgba(245,240,232,0.88); }
+
+  /* Guía para principiantes */
+  .guide-steps { display: grid; gap: 14px; }
+  .guide-step { display: flex; gap: 14px; align-items: flex-start; }
+  .guide-step-num {
+    font-family: 'Cinzel Decorative', serif; color: var(--gold); font-size: 1.3rem;
+    min-width: 32px; text-align: center; opacity: 0.8;
+  }
+  .guide-step-text { font-size: 0.98rem; line-height: 1.75; color: rgba(245,240,232,0.85); }
+
+  /* Latín */
+  .latin-toggle {
+    display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
+    font-family: 'Cinzel', serif; font-size: 0.66rem; letter-spacing: 0.15em;
+    text-transform: uppercase; color: rgba(201,168,76,0.75); cursor: pointer;
+    border: 1px solid rgba(201,168,76,0.3); border-radius: 14px; padding: 5px 12px;
+    background: rgba(201,168,76,0.04); user-select: none; transition: all 0.25s ease;
+  }
+  .latin-toggle:hover { color: var(--gold); border-color: var(--gold); }
+  .latin-text {
+    margin-top: 10px; padding: 14px 18px; border-left: 2px solid var(--gold-dark);
+    background: rgba(201,168,76,0.05); font-style: italic; line-height: 1.85;
+    font-size: 0.96rem; color: rgba(232,201,122,0.88); display: none;
+  }
+  .latin-text.show { display: block; }
+
+  /* Fruto del misterio */
+  .fruit-block {
+    margin-top: 14px; padding: 14px 18px; border: 1px dashed rgba(201,168,76,0.3);
+    background: rgba(201,168,76,0.03);
+  }
+  .fruit-label {
+    font-family: 'Cinzel', serif; font-size: 0.62rem; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--gold); opacity: 0.8; margin-bottom: 6px;
+  }
+  .fruit-text { font-size: 0.95rem; line-height: 1.78; color: rgba(245,240,232,0.85); }
+
+  /* Banner "Misterios de hoy" */
+  .today-banner {
+    max-width: 920px; margin: 0 auto 28px; padding: 16px 22px;
+    border: 1px solid rgba(201,168,76,0.35); background: rgba(201,168,76,0.07);
+    display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+  }
+  .today-banner .tb-text { font-size: 0.92rem; color: var(--gold-light); line-height: 1.6; }
+  .today-banner .tb-text strong { color: var(--gold); }
+  .today-banner button {
+    font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 9px 16px; border: 1px solid var(--gold); background: rgba(201,168,76,0.15);
+    color: var(--gold); cursor: pointer; border-radius: 2px; transition: all 0.25s ease; white-space: nowrap;
+  }
+  .today-banner button:hover { background: rgba(201,168,76,0.3); box-shadow: 0 0 14px rgba(201,168,76,0.3); }
+  .tab-btn.today-mark { position: relative; }
+  .tab-btn.today-mark::after {
+    content: '●'; position: absolute; top: -2px; right: 2px; color: var(--gold-light);
+    font-size: 0.55rem; animation: glow-pulse 3.5s ease-in-out infinite;
+  }
+
+  /* Botón volver arriba */
+  .scroll-top-btn {
+    position: fixed; right: 14px; bottom: 70px; z-index: 499;
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.4); background: rgba(16,10,30,0.85);
+    color: var(--gold); font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  }
+  .scroll-top-btn.show { opacity: 1; pointer-events: auto; }
+
+  @media (max-width: 600px) {
+    .mystery-image img { max-height: 220px; }
+    .tb-btn { font-size: 0.62rem; padding: 7px 11px; }
+    .today-banner { flex-direction: column; align-items: stretch; text-align: center; }
+  }
 </style>
 </head>
 <body>
+
+<div class="floating-toolbar">
+  <button class="tb-btn" id="btnOracion" onclick="toggleModoOracion()">🌙 Modo Oscuro</button>
+  <button class="tb-btn" id="btnExpand" onclick="toggleExpandAll()">⤢ Expandir Todo</button>
+  <button class="tb-btn" onclick="cambiarFuente(-1)">A−</button>
+  <button class="tb-btn" onclick="cambiarFuente(0)">A</button>
+  <button class="tb-btn" onclick="cambiarFuente(1)">A+</button>
+  <button class="tb-btn" onclick="cambiarAve(1)">📿 Avemarías <span class="tb-counter-num" id="aveCount">0</span></button>
+  <button class="tb-btn" onclick="cambiarAve(-1)">−1</button>
+  <button class="tb-btn" onclick="cambiarAve(0)">↺ Reiniciar</button>
+</div>
+
+<button class="scroll-top-btn" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Volver arriba" aria-label="Volver arriba">↑</button>
 
 <div class="hero">
   <span class="cross-ornament">✙</span>
@@ -218,13 +412,16 @@
 </div>
 
 <div class="nav-tabs">
-  <button class="tab-btn active" onclick="showGroup('comenzar')">✙ Cómo Rezar</button>
-  <button class="tab-btn" onclick="showGroup('gozosos')">🌸 Gozosos</button>
-  <button class="tab-btn" onclick="showGroup('dolorosos')">✝ Dolorosos</button>
-  <button class="tab-btn" onclick="showGroup('gloriosos')">☀ Gloriosos</button>
-  <button class="tab-btn" onclick="showGroup('luminosos')">✦ Luminosos</button>
-  <button class="tab-btn" onclick="showGroup('oraciones-fin')">🌹 Oraciones Finales</button>
+  <button class="tab-btn active" data-group="comenzar" onclick="showGroup('comenzar')">✙ Cómo Rezar</button>
+  <button class="tab-btn" data-group="gozosos" onclick="showGroup('gozosos')">🌸 Gozosos</button>
+  <button class="tab-btn" data-group="dolorosos" onclick="showGroup('dolorosos')">✝ Dolorosos</button>
+  <button class="tab-btn" data-group="gloriosos" onclick="showGroup('gloriosos')">☀ Gloriosos</button>
+  <button class="tab-btn" data-group="luminosos" onclick="showGroup('luminosos')">✦ Luminosos</button>
+  <button class="tab-btn" data-group="oraciones-fin" onclick="showGroup('oraciones-fin')">🌹 Oraciones Finales</button>
+  <button class="tab-btn" data-group="promesas" onclick="showGroup('promesas')">🤍 Promesas de María</button>
 </div>
+
+<div class="today-banner" id="todayBanner"></div>
 
 <div class="main">
 
@@ -234,6 +431,29 @@
     <div class="group-type">Preparación y Apertura</div>
     <div class="group-title">Cómo Rezar el Santo Rosario</div>
     <div class="group-days">Estructura tradicional completa</div>
+  </div>
+
+
+  <div class="rosario-intro">
+    <div class="intro-header">
+      <div class="intro-icon">🌱</div>
+      <div>
+        <div class="intro-title">¿Es tu primera vez? Empieza por aquí</div>
+        <div class="intro-subtitle">Una guía sencilla para quien nunca rezó el Rosario</div>
+      </div>
+    </div>
+    <div class="intro-body">
+      <div class="guide-steps">
+        <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-step-text">No necesitas saberte nada de memoria al principio: todas las oraciones están escritas completas en esta página, paso por paso. Solo sigue el orden.</div></div>
+        <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-step-text">Toma tu rosario (o cuenta con los dedos si no tienes uno) y comienza por la <strong>Señal de la Cruz</strong> y el <strong>Acto de Contrición</strong>, que están más abajo en esta misma sección.</div></div>
+        <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-step-text">Reza el <strong>Credo</strong>, un <strong>Padre Nuestro</strong>, tres <strong>Ave Marías</strong> y el <strong>Gloria</strong> sobre el crucifijo y las primeras cuentas.</div></div>
+        <div class="guide-step"><div class="guide-step-num">4</div><div class="guide-step-text">Elige el grupo de misterios según el día (lo ves en la tabla de abajo) tocando una de las pestañas: Gozosos, Dolorosos, Gloriosos o Luminosos.</div></div>
+        <div class="guide-step"><div class="guide-step-num">5</div><div class="guide-step-text">Por cada misterio reza: <strong>1 Padre Nuestro + 10 Ave Marías + 1 Gloria + la Jaculatoria de Fátima</strong>, mientras meditas en silencio el misterio (puedes leer la "Explicación" antes de comenzar la decena).</div></div>
+        <div class="guide-step"><div class="guide-step-num">6</div><div class="guide-step-text">Usa el contador de <strong>📿 Avemarías</strong> en la barra inferior para no perder la cuenta, y marca con el <strong>tracker de decenas</strong> en qué misterio vas.</div></div>
+        <div class="guide-step"><div class="guide-step-num">7</div><div class="guide-step-text">Al terminar los cinco misterios, ve a la pestaña <strong>🌹 Oraciones Finales</strong> para la Salve y la Letanía. Si estás cansado o es de noche, activa el <strong>🌙 Modo Oración</strong> para una vista más simple y con letra más grande.</div></div>
+        <div class="guide-step"><div class="guide-step-num">✦</div><div class="guide-step-text">No te preocupes por hacerlo "perfecto". Lo importante es el corazón puesto en la oración. ¡Bienvenido al Rosario!</div></div>
+      </div>
+    </div>
   </div>
 
   <div class="rosario-intro">
@@ -248,6 +468,8 @@
       <div class="oracion-item">
         <div class="oracion-nombre">Señal de la Cruz</div>
         <div class="oracion-texto">Por la señal de la Santa Cruz, de nuestros enemigos líbranos, Señor, Dios nuestro. En el nombre del Padre, y del Hijo, y del Espíritu Santo. Amén.</div>
+        <span class="latin-toggle" onclick="toggleLatin(this)">🕯 Ver en latín</span>
+        <div class="latin-text">Per signum Crucis de inimicis nostris libera nos, Deus noster. In nomine Patris, et Filii, et Spiritus Sancti. Amen.</div>
       </div>
       <div class="oracion-item">
         <div class="oracion-nombre">Acto de Contrición</div>
@@ -276,19 +498,27 @@
       <div class="oracion-item">
         <div class="oracion-nombre">El Credo Apostólico</div>
         <div class="oracion-texto">Creo en Dios, Padre todopoderoso, Creador del cielo y de la tierra. Creo en Jesucristo, su único Hijo, nuestro Señor, que fue concebido por obra y gracia del Espíritu Santo, nació de santa María Virgen, padeció bajo el poder de Poncio Pilato, fue crucificado, muerto y sepultado, descendió a los infiernos, al tercer día resucitó de entre los muertos, subió a los cielos y está sentado a la derecha de Dios, Padre todopoderoso. Desde allí ha de venir a juzgar a vivos y muertos. Creo en el Espíritu Santo, la santa Iglesia católica, la comunión de los santos, el perdón de los pecados, la resurrección de la carne y la vida eterna. Amén.</div>
+        <span class="latin-toggle" onclick="toggleLatin(this)">🕯 Ver en latín</span>
+        <div class="latin-text">Credo in Deum, Patrem omnipotentem, Creatorem caeli et terrae. Et in Iesum Christum, Filium eius unicum, Dominum nostrum, qui conceptus est de Spiritu Sancto, natus ex Maria Virgine, passus sub Pontio Pilato, crucifixus, mortuus, et sepultus, descendit ad inferos, tertia die resurrexit a mortuis, ascendit ad caelos, sedet ad dexteram Dei Patris omnipotentis, inde venturus est iudicare vivos et mortuos. Credo in Spiritum Sanctum, sanctam Ecclesiam catholicam, sanctorum communionem, remissionem peccatorum, carnis resurrectionem, vitam aeternam. Amen.</div>
       </div>
       <div class="oracion-item">
         <div class="oracion-nombre">Padre Nuestro</div>
         <div class="oracion-texto">Padre nuestro, que estás en el cielo, santificado sea tu Nombre; venga a nosotros tu reino; hágase tu voluntad en la tierra como en el cielo. Danos hoy nuestro pan de cada día; perdona nuestras ofensas, como también nosotros perdonamos a los que nos ofenden; no nos dejes caer en la tentación, y líbranos del mal. Amén.</div>
+        <span class="latin-toggle" onclick="toggleLatin(this)">🕯 Ver en latín</span>
+        <div class="latin-text">Pater noster, qui es in caelis, sanctificetur nomen tuum. Adveniat regnum tuum. Fiat voluntas tua, sicut in caelo et in terra. Panem nostrum quotidianum da nobis hodie, et dimitte nobis debita nostra, sicut et nos dimittimus debitoribus nostris. Et ne nos inducas in tentationem, sed libera nos a malo. Amen.</div>
       </div>
       <div class="oracion-item">
         <div class="oracion-nombre">Tres Ave Marías — por las virtudes teologales</div>
         <div class="oracion-texto">Ave María, llena eres de gracia; el Señor es contigo. Bendita tú eres entre todas las mujeres, y bendito es el fruto de tu vientre, Jesús. Santa María, Madre de Dios, ruega por nosotros pecadores, ahora y en la hora de nuestra muerte. Amén.</div>
         <div class="oracion-nota">Se reza tres veces: la primera pidiendo el aumento de la fe, la segunda de la esperanza, la tercera de la caridad.</div>
+        <span class="latin-toggle" onclick="toggleLatin(this)">🕯 Ver en latín</span>
+        <div class="latin-text">Ave Maria, gratia plena, Dominus tecum. Benedicta tu in mulieribus, et benedictus fructus ventris tui, Iesus. Sancta Maria, Mater Dei, ora pro nobis peccatoribus, nunc et in hora mortis nostrae. Amen.</div>
       </div>
       <div class="oracion-item">
         <div class="oracion-nombre">Gloria Patri</div>
         <div class="oracion-texto">Gloria al Padre, y al Hijo, y al Espíritu Santo. Como era en el principio, ahora y siempre, por los siglos de los siglos. Amén.</div>
+        <span class="latin-toggle" onclick="toggleLatin(this)">🕯 Ver en latín</span>
+        <div class="latin-text">Gloria Patri, et Filio, et Spiritui Sancto. Sicut erat in principio, et nunc, et semper, et in saecula saeculorum. Amen.</div>
       </div>
     </div>
   </div>
@@ -322,20 +552,28 @@
       <div class="oracion-item">
         <div class="oracion-nombre">③ Padre Nuestro — sobre la cuenta grande</div>
         <div class="oracion-texto">Padre nuestro, que estás en el cielo, santificado sea tu Nombre; venga a nosotros tu reino; hágase tu voluntad en la tierra como en el cielo. Danos hoy nuestro pan de cada día; perdona nuestras ofensas, como también nosotros perdonamos a los que nos ofenden; no nos dejes caer en la tentación, y líbranos del mal. Amén.</div>
+        <span class="latin-toggle" onclick="toggleLatin(this)">🕯 Ver en latín</span>
+        <div class="latin-text">Pater noster, qui es in caelis, sanctificetur nomen tuum. Adveniat regnum tuum. Fiat voluntas tua, sicut in caelo et in terra. Panem nostrum quotidianum da nobis hodie, et dimitte nobis debita nostra, sicut et nos dimittimus debitoribus nostris. Et ne nos inducas in tentationem, sed libera nos a malo. Amen.</div>
       </div>
       <div class="oracion-item">
         <div class="oracion-nombre">④ Diez Ave Marías — meditando el misterio</div>
         <div class="oracion-texto">Ave María, llena eres de gracia; el Señor es contigo. Bendita tú eres entre todas las mujeres, y bendito es el fruto de tu vientre, Jesús. Santa María, Madre de Dios, ruega por nosotros pecadores, ahora y en la hora de nuestra muerte. Amén.</div>
         <div class="oracion-nota">Se reza diez veces, meditando interiormente el misterio anunciado durante cada Ave María.</div>
+        <span class="latin-toggle" onclick="toggleLatin(this)">🕯 Ver en latín</span>
+        <div class="latin-text">Ave Maria, gratia plena, Dominus tecum. Benedicta tu in mulieribus, et benedictus fructus ventris tui, Iesus. Sancta Maria, Mater Dei, ora pro nobis peccatoribus, nunc et in hora mortis nostrae. Amen.</div>
       </div>
       <div class="oracion-item">
         <div class="oracion-nombre">⑤ Gloria Patri</div>
         <div class="oracion-texto">Gloria al Padre, y al Hijo, y al Espíritu Santo. Como era en el principio, ahora y siempre, por los siglos de los siglos. Amén.</div>
+        <span class="latin-toggle" onclick="toggleLatin(this)">🕯 Ver en latín</span>
+        <div class="latin-text">Gloria Patri, et Filio, et Spiritui Sancto. Sicut erat in principio, et nunc, et semper, et in saecula saeculorum. Amen.</div>
       </div>
       <div class="oracion-item">
         <div class="oracion-nombre">⑥ Jaculatoria de Fátima (después del Gloria)</div>
         <div class="oracion-texto">¡Oh Jesús mío! Perdona nuestros pecados, líbranos del fuego del infierno, lleva al cielo a todas las almas, especialmente a las más necesitadas de tu misericordia.</div>
         <div class="oracion-nota">Revelada por la Santísima Virgen a los pastorcillos de Fátima (1917). Se repite al final de cada decena, tras el Gloria.</div>
+        <span class="latin-toggle" onclick="toggleLatin(this)">🕯 Ver en latín</span>
+        <div class="latin-text">O mi Iesu, dimitte nobis debita nostra, libera nos ab igne inferiori, et perduc in caelum omnes animas, praesertim illas quae maxime indigent misericordia tua.</div>
       </div>
     </div>
   </div>
@@ -376,105 +614,133 @@
     <div class="group-type">Primer Grupo</div>
     <div class="group-title">Misterios Gozosos</div>
     <div class="group-days">📅 Lunes y Sábados</div>
+
+    <div class="tracker-label">Toca un numeral para ir directo a ese misterio y marcar en cuál vas</div>
+    <div class="decade-tracker" id="tracker-gozosos"><div class="decade-dot" data-group="gozosos" data-n="1" title="La Anunciación" onclick="marcarDecena('gozosos',1)">I</div><div class="decade-dot" data-group="gozosos" data-n="2" title="La Visitación" onclick="marcarDecena('gozosos',2)">II</div><div class="decade-dot" data-group="gozosos" data-n="3" title="El Nacimiento" onclick="marcarDecena('gozosos',3)">III</div><div class="decade-dot" data-group="gozosos" data-n="4" title="La Presentación" onclick="marcarDecena('gozosos',4)">IV</div><div class="decade-dot" data-group="gozosos" data-n="5" title="El Niño Hallado" onclick="marcarDecena('gozosos',5)">V</div></div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="gozosos-1">
     <div class="card-header"><div class="mystery-number">I</div><div class="card-title-block"><div class="mystery-name">La Anunciación del Ángel a María</div><div class="mystery-virtue">Virtud a pedir: Humildad</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Fra%20Angelico%20-%20Annunciation%20-%20WGA00611.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, Madre de misericordia. A ti suspiramos gimiendo y llorando en este valle de lágrimas. Vuelve a nosotros esos tus ojos misericordiosos y muéstranos a Jesús, fruto bendito de tu vientre. Ruega por nosotros, Madre, al contemplar este misterio de tu Anunciación. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">El arcángel Gabriel es enviado por Dios a Nazaret para anunciar a la Virgen María que será la Madre del Hijo de Dios. Con perfecta humildad y total entrega, María pronuncia su «fiat»: su «hágase». En ese instante el Verbo Eterno se encarna en su seno virginal y comienza la Redención. Este misterio celebra la unión perfecta entre la voluntad divina y la obediencia humana.</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Lucas 1, 26–28</div><div class="verse-text">«En el mes sexto fue enviado el ángel Gabriel de parte de Dios a una ciudad de Galilea, llamada Nazaret, a una virgen desposada con un varón de nombre José, de la casa de David; y el nombre de la virgen era María. Y el ángel, entrando donde ella estaba, le dijo: ¡Salve, llena de gracia! El Señor está contigo.»</div></div>
         <div class="verse"><div class="verse-ref">Lucas 1, 31.35.38</div><div class="verse-text">«Concebirás en tu seno y darás a luz un hijo, y le pondrás por nombre Jesús... El Espíritu Santo vendrá sobre ti y el poder del Altísimo te cubrirá con su sombra; por lo cual el Santo que va a nacer será llamado Hijo de Dios... Entonces María dijo: He aquí la esclava del Señor; hágase en mí según tu palabra.»</div></div>
         <div class="verse"><div class="verse-ref">Isaías 7, 14</div><div class="verse-text">«Por eso el Señor mismo os dará una señal: He aquí que la virgen concebirá y dará a luz un hijo, y le pondrá por nombre Emmanuel.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">Señor Jesús, que en el seno purísimo de María quisiste hacerte hombre para salvarnos, concédenos imitar la humildad y la docilidad de tu Madre Santísima. Enséñanos a decir con el corazón nuestro propio «sí» a tu voluntad, sin reservas y sin miedos, confiando que en Ti todo se cumple con perfección. María, llena de gracia, intercede por nosotros ante tu Hijo. Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">El «fiat» de María no fue una rendición pasiva, sino el acto de libertad más heroico de la historia humana. Dios esperó su respuesta. También espera la nuestra. ¿Cuántas veces le hemos negado nuestro «sí» por miedo, orgullo o comodidad? Meditemos hoy qué áreas de nuestra vida aún no hemos entregado a Dios, y pidamos la gracia de pronunciar, como María, un «hágase» total y confiado.</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Hoy, ante una decisión —pequeña o grande— que debas tomar, repite interiormente «hágase» antes de actuar. La humildad de María consistió en no necesitar entenderlo todo para confiar. Pide la gracia de obedecer a Dios incluso cuando su plan te resulte oscuro.</div></div>
     </div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="gozosos-2">
     <div class="card-header"><div class="mystery-number">II</div><div class="card-title-block"><div class="mystery-name">La Visitación de María a su Prima Isabel</div><div class="mystery-virtue">Virtud a pedir: Caridad hacia el prójimo</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Mariotto%20Albertinelli%20-%20Visitation%20-%20WGA00254.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, vida y dulzura nuestra. Ruega por nosotros al contemplar este misterio de tu Visitación a Isabel, en que llevaste a Cristo a un hogar y lo llenaste de alegría y gracia. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">Recién concebido Jesús en su seno, María no piensa en sí misma sino en su prima Isabel, anciana y embarazada. Recorre con prontitud y amor las montañas de Judea. Al saludarla, el Bautista salta de gozo en el vientre de su madre, y el Espíritu Santo llena a Isabel, quien proclama la bienaventuranza de María. Esta visita es el primer «apostolado» de Cristo, llevado en el vientre de su Madre.</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Lucas 1, 39–42</div><div class="verse-text">«En aquellos días se levantó María y fue con prontitud a la región montañosa, a una ciudad de Judá; y entró en la casa de Zacarías y saludó a Isabel. Y aconteció que, en cuanto oyó Isabel el saludo de María, saltó de gozo el niño en su seno, e Isabel quedó llena del Espíritu Santo; y exclamó a gran voz y dijo: ¡Bendita tú entre las mujeres, y bendito el fruto de tu vientre!»</div></div>
         <div class="verse"><div class="verse-ref">Lucas 1, 44–45</div><div class="verse-text">«Porque en cuanto llegó la voz de tu salutación a mis oídos, saltó de gozo el niño en mi seno. ¡Y bienaventurada la que creyó que se cumplirían las cosas que le fueron dichas de parte del Señor!»</div></div>
         <div class="verse"><div class="verse-ref">Lucas 1, 46–49</div><div class="verse-text">«Entonces María dijo: Mi alma engrandece al Señor, y mi espíritu se alegra en Dios mi Salvador, porque ha mirado la humildad de su esclava; pues he aquí que desde ahora me llamarán bienaventurada todas las generaciones, porque el Poderoso ha hecho grandes cosas por mí; y santo es su nombre.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">Señor, que en la Visitación de tu Madre quisiste llenar de gozo el hogar de Isabel, enséñanos a llevar Tu presencia a quienes nos rodean. Que como María, seamos mensajeros de Tu gracia con prontitud y alegría. Danos la sensibilidad para reconocer las necesidades del prójimo y el generoso corazón de servirlos sin demora. Virgen del Magnificat, haz que nuestras vidas sean también un canto de alabanza a Dios en cada obra de caridad. Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">María no contempló egoístamente su don, sino que corrió a compartirlo. Donde llega quien lleva a Cristo, el gozo precede su entrada. El mundo busca felicidad en posesiones y placeres; los que llevan a Jesús en el corazón hacen saltar de gozo a los que encuentran. ¿Somos nosotros portadores de esa alegría? ¿Nuestra presencia llena de paz o de tensión los hogares que visitamos?</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Piensa en alguien que hoy necesite una visita, una llamada o una ayuda concreta, y llévasela sin que te lo pidan, como hizo María con Isabel. Llevar a Cristo a otros no requiere grandes discursos: basta la presencia y el servicio silencioso.</div></div>
     </div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="gozosos-3">
     <div class="card-header"><div class="mystery-number">III</div><div class="card-title-block"><div class="mystery-name">El Nacimiento de Jesús en Belén</div><div class="mystery-virtue">Virtud a pedir: Pobreza de espíritu / Desprendimiento</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Gerard%20van%20Honthorst%20-%20Adoration%20of%20the%20Shepherds%20-%20WGA11716.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, esperanza nuestra. Ruega por nosotros al contemplar el nacimiento de tu Hijo Jesús en el humilde pesebre de Belén, rechazado por los hombres pero adorado por los ángeles. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">El Hijo de Dios, Rey del universo, elige nacer en la pobreza total de un pesebre, rechazado por los hombres. Pastores sencillos son los primeros convocados por los ángeles; sabios del Oriente siguen una estrella hasta Belén. El misterio de la Encarnación se consuma: Dios se hace niño vulnerable para acercarse a nosotros y rescatarnos de la soberbia del pecado.</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Lucas 2, 6–7</div><div class="verse-text">«Y aconteció que estando ellos allí, se cumplieron los días de su parto. Y dio a luz a su hijo primogénito, y le envolvió en pañales y le acostó en un pesebre, porque no había lugar para ellos en el mesón.»</div></div>
         <div class="verse"><div class="verse-ref">Lucas 2, 10–14</div><div class="verse-text">«Pero el ángel les dijo: No temáis; porque he aquí os doy nuevas de gran gozo, que será para todo el pueblo: que os ha nacido hoy, en la ciudad de David, un Salvador, que es Cristo el Señor. Esto os servirá de señal: Hallaréis al niño envuelto en pañales, acostado en un pesebre. Y repentinamente apareció con el ángel una multitud de las huestes celestiales, que alababan a Dios, y decían: ¡Gloria a Dios en las alturas, y en la tierra paz, buena voluntad para con los hombres!»</div></div>
         <div class="verse"><div class="verse-ref">Juan 1, 14</div><div class="verse-text">«Y el Verbo se hizo carne, y habitó entre nosotros (y vimos su gloria, gloria como del unigénito del Padre), lleno de gracia y de verdad.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">Jesús, que naciste pobre entre los pobres para enriquecernos con tu divinidad, ayúdanos a desprendernos de cuanto nos aleja de Ti. Libéranos de la tiranía de los bienes materiales y del afán de comodidad que nos cierra el corazón a los demás. Que como los pastores, corramos a adorarte sin demora, y como los Magos, ofrezcamos lo más precioso de nuestra vida como regalo a tu pesebre. Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">Dios eligió la pobreza para enseñarnos que no nos necesita impresionantes, sino disponibles. El pesebre revela que el amor divino no busca la pompa sino la entrega. A veces llenamos nuestras vidas de tantas cosas que no queda lugar para el Niño Jesús, igual que aquel mesón de Belén. ¿Qué «mesones llenos» debemos vaciar para hacer espacio a Cristo hoy?</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Examina qué «posesiones» —objetos, comodidades, hábitos— ocupan hoy el lugar que debería ser de Dios en tu corazón. Pide a Jesús pobre de Belén la gracia de simplificar tu vida y de encontrar alegría en lo esencial, no en lo acumulado.</div></div>
     </div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="gozosos-4">
     <div class="card-header"><div class="mystery-number">IV</div><div class="card-title-block"><div class="mystery-name">La Presentación de Jesús en el Templo</div><div class="mystery-virtue">Virtud a pedir: Obediencia y pureza de corazón</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Fra%20Angelico%20-%20Presentation%20of%20Christ%20in%20the%20Temple%20-%20WGA00640.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, abogada nuestra. Ruega por nosotros al contemplar la Presentación de Jesús en el Templo, donde la profecía de Simeón anunció la primera espada de dolor que traspasaría tu alma. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">Según la Ley de Moisés, cuarenta días después del nacimiento, María y José presentan al Niño en el Templo de Jerusalén y ofrecen los pobres palominos. El anciano Simeón, movido por el Espíritu, reconoce en ese Niño al Salvador prometido y profetiza el sufrimiento de María: «y una espada traspasará tu misma alma». Ana, la profetisa, también alaba a Dios. Es el momento de la ofrenda total: Jesús se presenta al Padre como víctima futura.</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Lucas 2, 22.24</div><div class="verse-text">«Y cuando se cumplieron los días de la purificación de ellos, conforme a la ley de Moisés, le trajeron a Jerusalén para presentarle al Señor... y para ofrecer conforme a lo que se dice en la ley del Señor: Un par de tórtolas, o dos palominos.»</div></div>
         <div class="verse"><div class="verse-ref">Lucas 2, 28–32</div><div class="verse-text">«Él [Simeón] le tomó en sus brazos, y bendijo a Dios, y dijo: Ahora, Señor, despides a tu siervo en paz, conforme a tu palabra; porque han visto mis ojos tu salvación, la cual has preparado en presencia de todos los pueblos; luz para revelación a los gentiles, y gloria de tu pueblo Israel.»</div></div>
         <div class="verse"><div class="verse-ref">Lucas 2, 34–35</div><div class="verse-text">«Y los bendijo Simeón, y dijo a su madre María: He aquí, éste está puesto para caída y para levantamiento de muchos en Israel; y para señal que será contradicha (y una espada atravesará tu misma alma), para que sean revelados los pensamientos de muchos corazones.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">Señor Jesús, presentado en el Templo como ofrenda viva al Padre, concédenos también a nosotros la gracia de ofrecerte nuestra vida entera. Que nuestros corazones sean templos dignos de Tu presencia. Como Simeón, ayúdanos a reconocerte en los pequeños, los pobres y los olvidados, y como Ana, que nunca cesemos de agradecerte el don de la salvación. Virgen dolorosa, cuyo corazón fue traspasado por la profecía, fortalece nuestra fe en los momentos oscuros. Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">La profecía de Simeón une la alegría con el anuncio del dolor. Esto nos enseña que seguir a Cristo lleva consigo la cruz. Pero también la paz que Simeón describe —«despides a tu siervo en paz»— nos revela que quien ha visto a Jesús puede morir tranquilo. ¿Tenemos esa paz interior que solo Él puede dar? ¿Hemos ofrecido realmente nuestra vida a Dios o solo «prestamos» ciertas horas del domingo?</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Ofrece a Dios, como María y José ofrecieron al Niño, algo que te cuesta entregar: un proyecto, una persona querida, un temor sobre el futuro. La ofrenda total es el primer paso hacia la paz que solo Dios da.</div></div>
     </div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="gozosos-5">
     <div class="card-header"><div class="mystery-number">V</div><div class="card-title-block"><div class="mystery-name">El Niño Jesús Perdido y Hallado en el Templo</div><div class="mystery-virtue">Virtud a pedir: Búsqueda de Dios / Piedad filial</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/William%20Holman%20Hunt%20-%20The%20Finding%20of%20the%20Saviour%20in%20the%20Temple.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, dulce siempre Virgen. Ruega por nosotros al contemplar los tres dolorosos días de búsqueda de tu Hijo Jesús en Jerusalén, y el gozo incomparable de hallarlo en el Templo de su Padre. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">A los doce años, Jesús permanece en Jerusalén cuando sus padres parten de regreso a Nazaret. Tras tres días angustiantes de búsqueda, lo encuentran en el Templo, sentado entre los doctores, escuchándolos e interrogándolos, y todos se maravillaban de su inteligencia. Su respuesta —«¿No sabíais que debo estar en las cosas de mi Padre?»— revela su plena conciencia de misión divina. El misterio nos habla de la búsqueda dolorosa de Dios y del gozo incomparable de hallarlo.</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Lucas 2, 46–47</div><div class="verse-text">«Y aconteció que tres días después le hallaron en el templo, sentado en medio de los doctores de la ley, oyéndoles y preguntándoles. Y todos los que le oían estaban atónitos de su inteligencia y de sus respuestas.»</div></div>
         <div class="verse"><div class="verse-ref">Lucas 2, 48–49</div><div class="verse-text">«Y cuando le vieron, se maravillaron; y su madre le dijo: Hijo, ¿por qué has hecho esto? He aquí que tu padre y yo te hemos buscado angustiados. Entonces él les dijo: ¿Por qué me buscabais? ¿No sabíais que en los negocios de mi Padre me es necesario estar?»</div></div>
         <div class="verse"><div class="verse-ref">Lucas 2, 51–52</div><div class="verse-text">«Y descendió con ellos, y vino a Nazaret, y estaba sujeto a ellos. Y su madre guardaba todas estas cosas en su corazón. Y Jesús crecía en sabiduría y en estatura, y en gracia para con Dios y los hombres.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">Señor Jesús, que quisiste ser buscado con angustia para ser hallado con gozo aun mayor, concédenos no conformarnos nunca con Tu ausencia. Cuando el pecado o la tibieza nos alejen de Ti, danos la gracia de buscarte con la misma perseverancia con que María y José te buscaron durante tres días. Que siempre te hallemos en Tu Iglesia, en la oración y en la Eucaristía, y que como Tú en Nazaret, crezcamos en sabiduría, en santidad y en gracia ante Dios y ante los hombres. Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">María y José experimentaron lo que es perder a Jesús. El alma que ha conocido la intimidad con Cristo y luego la pierde por el pecado siente ese mismo vacío desgarrador. Pero la buena noticia es que Él siempre puede ser hallado: en su Templo, es decir, en la Iglesia, la Eucaristía y la oración. ¿Cuándo fue la última vez que buscamos a Jesús con esa urgencia de «tres días»? ¿O nos hemos acostumbrado a vivir sin sentir su ausencia?</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Si hay algo en tu vida que sientes «perdido» —una relación, una vocación, la fe misma—, confía en que, como María y José, lo recuperarás buscando primero «en las cosas de tu Padre». Dedica unos minutos hoy a buscar a Dios antes de buscar soluciones.</div></div>
     </div>
   </div>
 </div>
@@ -485,97 +751,122 @@
     <div class="group-type">Segundo Grupo</div>
     <div class="group-title">Misterios Dolorosos</div>
     <div class="group-days">📅 Martes y Viernes</div>
+
+    <div class="tracker-label">Toca un numeral para ir directo a ese misterio y marcar en cuál vas</div>
+    <div class="decade-tracker" id="tracker-dolorosos"><div class="decade-dot" data-group="dolorosos" data-n="1" title="La Agonía" onclick="marcarDecena('dolorosos',1)">I</div><div class="decade-dot" data-group="dolorosos" data-n="2" title="La Flagelación" onclick="marcarDecena('dolorosos',2)">II</div><div class="decade-dot" data-group="dolorosos" data-n="3" title="Coronación de Espinas" onclick="marcarDecena('dolorosos',3)">III</div><div class="decade-dot" data-group="dolorosos" data-n="4" title="La Cruz a Cuestas" onclick="marcarDecena('dolorosos',4)">IV</div><div class="decade-dot" data-group="dolorosos" data-n="5" title="La Crucifixión" onclick="marcarDecena('dolorosos',5)">V</div></div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="dolorosos-1">
     <div class="card-header"><div class="mystery-number">I</div><div class="card-title-block"><div class="mystery-name">La Agonía de Jesús en el Huerto de Getsemaní</div><div class="mystery-virtue">Virtud a pedir: Contrición de los pecados</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Andrea%20Mantegna%20-%20Agony%20in%20the%20Garden%20-%20WGA14008.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, Madre de misericordia. Ruega por nosotros al contemplar la agonía de tu Hijo en el huerto de Getsemaní, cargando el peso de todos nuestros pecados en la oscuridad de la noche, sudando sangre. Danos contrición sincera. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">Después de la Última Cena, Jesús va al Huerto de Getsemaní con sus discípulos. Allí, anticipando en su alma todos los pecados de la humanidad y el tormento de la Pasión, su angustia es tan intensa que suda sangre. Los apóstoles duermen. Un ángel lo conforta. Jesús acepta libremente el cáliz de la Pasión con perfecta obediencia al Padre. Es la lucha suprema del amor divino contra el pecado humano.</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Mateo 26, 36–39</div><div class="verse-text">«Entonces llegó Jesús con ellos a un lugar que se llama Getsemaní, y dijo a sus discípulos: Sentaos aquí, mientras yo voy allá y oro. Y tomando a Pedro, y a los dos hijos de Zebedeo, comenzó a entristecerse y a angustiarse en gran manera. Entonces Jesús les dijo: Mi alma está muy triste, hasta la muerte; quedaos aquí, y velad conmigo. Y yendo un poco adelante, se postró sobre su rostro, orando y diciendo: Padre mío, si es posible, pase de mí esta copa; pero no sea como yo quiero, sino como tú.»</div></div>
         <div class="verse"><div class="verse-ref">Lucas 22, 43–44</div><div class="verse-text">«Y se le apareció un ángel del cielo para fortalecerle. Y estando en agonía, oraba más intensamente; y era su sudor como grandes gotas de sangre que caían hasta la tierra.»</div></div>
         <div class="verse"><div class="verse-ref">Mateo 26, 41</div><div class="verse-text">«Velad y orad, para que no entréis en tentación; el espíritu a la verdad está dispuesto, pero la carne es débil.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">Señor Jesús, que en Getsemaní cargaste en tu alma inmaculada el peso de todos nuestros pecados, concédenos una profunda contrición por haberte causado tanto dolor. No permitas que dormitemos espiritualmente mientras Tú aguardas nuestra compañía en la oración. Danos fuerzas para aceptar también nuestros «cálices» —el sufrimiento, la enfermedad, la incomprensión— uniéndolos a los Tuyos con amor y confianza en el Padre. Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">Jesús no agonizó por cobardía sino por amor: tomó conscientemente sobre sí toda la carga del pecado humano. El dolor que sintió en Getsemaní fue el peso de nuestras culpas. Cada vez que pecamos, añadimos gotas de angustia a ese cáliz. Pero su «no mi voluntad, sino la tuya» sigue siendo el modelo perfecto de oración en el sufrimiento. ¿Cómo oramos nosotros en nuestras propias «noches de Getsemaní»?</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Lleva ante Dios, sin miedo ni vergüenza, aquello que más pesa en tu conciencia hoy. Jesús en Getsemaní cargó voluntariamente con lo que no quería sentir, para que tú no estés solo en tu propia «hora». Pide la fortaleza de aceptar su voluntad incluso en el dolor.</div></div>
     </div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="dolorosos-2">
     <div class="card-header"><div class="mystery-number">II</div><div class="card-title-block"><div class="mystery-name">La Flagelación de Jesús en la Columna</div><div class="mystery-virtue">Virtud a pedir: Mortificación de los sentidos</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Giotto%20-%20Scrovegni%20-%20-33-%20-%20Flagellation.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, llena de gracia. Ruega por nosotros al contemplar el cuerpo sacratísimo de tu Hijo atado a la columna y flagelado sin piedad. Que sus santas llagas sean nuestra sanación. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">Atado a una columna, el cuerpo sacratísimo de Jesús es azotado sin piedad por los soldados romanos. La flagelación romana era un suplicio brutal: el «flagrum» desgarraba la carne hasta los huesos. Jesús la sufre en silencio, expiando en su carne los pecados de la impureza, la sensualidad y los excesos del hombre. De esas llagas mana la medicina para todas las heridas del alma.</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Juan 19, 1</div><div class="verse-text">«Entonces Pilato tomó a Jesús y le azotó.»</div></div>
         <div class="verse"><div class="verse-ref">Isaías 53, 4–5</div><div class="verse-text">«Ciertamente él llevó nuestras enfermedades, y sufrió nuestros dolores; y nosotros le tuvimos por azotado, por herido de Dios y abatido. Mas él fue herido por nuestras rebeliones, molido por nuestros pecados; el castigo de nuestra paz fue sobre él, y por su llaga fuimos nosotros curados.»</div></div>
         <div class="verse"><div class="verse-ref">1 Pedro 2, 24</div><div class="verse-text">«Quien llevó él mismo nuestros pecados en su cuerpo sobre el madero, para que nosotros, estando muertos a los pecados, vivamos a la justicia; y por cuya herida fuisteis sanados.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">Jesús flagelado, que en tu carne desgarrada tomaste el castigo de nuestros pecados sensuales e impuros, purifica nuestros cuerpos y nuestros corazones. Danos la gracia de la mortificación cristiana, no como fin en sí mismo, sino como participación en tus sufrimientos redentores. Que el respeto por nuestro cuerpo, templo del Espíritu Santo, nos aleje de todo lo que lo degrada o envilece. Por tus santas llagas, sáname, Señor. Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">«Por su llaga fuimos curados» (Is 53,5). Las heridas de Cristo no son el final de la historia, sino el comienzo de nuestra sanación. Cada azote que sufrió tenía nombre: el nombre de un pecado nuestro, de una caída nuestra. La meditación de este misterio debería producir en nosotros no solo compasión sino conversión: alejarnos de los pecados de la carne que causaron esas llagas.</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Identifica un pequeño sacrificio —de comodidad, de palabras, de tiempo— que puedas ofrecer hoy en reparación por tus propios pecados y los de otros. La mortificación cristiana no busca el dolor por sí mismo, sino el amor que se entrega.</div></div>
     </div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="dolorosos-3">
     <div class="card-header"><div class="mystery-number">III</div><div class="card-title-block"><div class="mystery-name">La Coronación de Espinas</div><div class="mystery-virtue">Virtud a pedir: Fortaleza ante el desprecio y la humillación</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Titian%20-%20The%20Crowning%20with%20Thorns%20-%20WGA22834.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, Madre clementísima. Ruega por nosotros al contemplar la corona de espinas clavada en la cabeza sagrada de tu Hijo, el Rey del universo escarnecido por los hombres. Danos fortaleza en la humillación. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">Los soldados trenzan una corona de espinas y la clavan en la cabeza de Jesús, le ponen un manto de burla, le colocan una caña como cetro y se arrodillan ante Él gritando: «¡Salve, Rey de los judíos!». Es el escarnio del verdadero Rey del universo. Jesús soporta en silencio esta cruel humillación, expiando la soberbia, el orgullo y el afán de dominio del género humano.</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Mateo 27, 28–30</div><div class="verse-text">«Y desnudándole, le echaron encima un manto de escarlata; y pusieron sobre su cabeza una corona tejida de espinas, y una caña en su mano derecha; e hincando la rodilla delante de él, le escarnecían, diciendo: ¡Salve, Rey de los judíos! Y escupiéndole, tomaban la caña y le golpeaban en la cabeza.»</div></div>
         <div class="verse"><div class="verse-ref">Juan 19, 5</div><div class="verse-text">«Entonces Jesús salió, llevando la corona de espinas y el manto de púrpura. Y Pilato les dijo: ¡He aquí el hombre!»</div></div>
         <div class="verse"><div class="verse-ref">Isaías 53, 3</div><div class="verse-text">«Despreciado y desechado entre los hombres, varón de dolores, experimentado en quebranto; y como que escondimos de él el rostro, fue menospreciado, y no lo estimamos.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">Rey coronado de espinas, que aceptaste la humillación más cruel para expiar nuestra soberbia, danos la gracia de la verdadera humildad. Que no busquemos el aplauso ni el honor humano, sino solo Tu gloria. Cuando seamos despreciados, incomprendidos o burlados por vivir nuestra fe, concédenos cargar esa «corona de espinas» con Tu misma serenidad y amor. Fortalécenos para no avergonzarnos de Tu nombre. Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">Pilato presentó a Jesús coronado de espinas diciendo «¡Ecce Homo! ¡He aquí el hombre!» Sin saberlo, decía la verdad más profunda: en ese hombre desfigurado está todo lo que el hombre es capaz de hacerle al inocente. Pero también está todo lo que Dios es capaz de soportar por amor. ¿Cuánto aguantamos nosotros por Cristo? ¿Somos capaces de sufrir aunque sea una pequeña humillación por su causa?</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Piensa en una humillación, crítica o desprecio reciente que aún te duela, y ofrécelo unido a la corona de espinas de Jesús. Pide la gracia de responder con mansedumbre, sin necesidad de defender tu honor a toda costa.</div></div>
     </div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="dolorosos-4">
     <div class="card-header"><div class="mystery-number">IV</div><div class="card-title-block"><div class="mystery-name">Jesús Carga con la Cruz Camino al Calvario</div><div class="mystery-virtue">Virtud a pedir: Paciencia en las tribulaciones</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Giotto%20-%20Scrovegni%20-%20-34-%20-%20Road%20to%20Calvary.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, Madre dolorosa. Ruega por nosotros al contemplar a tu Hijo, extenuado y cubierto de llagas, cargando el madero de la Cruz por el camino del Calvario, mientras Tú lo seguías con el corazón partido. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">Agotado por los tormentos, Jesús carga sobre sus hombros lacerados el pesado madero de la Cruz. Recorre el camino del Calvario —la «Via Dolorosa»— entre empujones, golpes e insultos de la multitud. Cae varias veces bajo el peso. La Virgen María lo contempla con dolor inconmensurable. Simón de Cirene es obligado a ayudarle. Las piadosas mujeres de Jerusalén lloran por Él. Jesús llega exhausto al Gólgota. Este misterio santifica todas las cruces de nuestra vida.</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Juan 19, 17</div><div class="verse-text">«Y él, cargando su cruz, salió al lugar llamado de la Calavera, y en hebreo, Gólgota.»</div></div>
         <div class="verse"><div class="verse-ref">Marcos 15, 21</div><div class="verse-text">«Y obligaron a uno que pasaba, Simón de Cirene, padre de Alejandro y de Rufo, que venía del campo, a que le llevase la cruz.»</div></div>
         <div class="verse"><div class="verse-ref">Lucas 23, 27–28</div><div class="verse-text">«Y le seguía gran multitud del pueblo, y de mujeres que lloraban y hacían lamentación por él. Pero Jesús, vuelto hacia ellas, les dijo: Hijas de Jerusalén, no lloréis por mí, sino llorad por vosotras mismas y por vuestros hijos.»</div></div>
         <div class="verse"><div class="verse-ref">Mateo 16, 24</div><div class="verse-text">«Entonces Jesús dijo a sus discípulos: Si alguno quiere venir en pos de mí, niéguese a sí mismo, y tome su cruz, y sígame.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">Señor Jesús, que cargaste la cruz por nuestro amor, concédenos abrazar con paciencia y amor las cruces de nuestra vida cotidiana: la enfermedad, el fracaso, la incomprensión, la soledad. Que no huyamos de la cruz sino que la tomemos de tu mano, sabiendo que Tú la santificaste con Tu presencia. Como Simón de Cirene, que haya en nuestro camino quien nos ayude, y que nosotros seamos también los cireneos de los hermanos que sufren. Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">Jesús no nos prometió vida sin cruz; prometió caminar a nuestro lado cuando la cargamos. La cruz no es el fracaso de Dios sino su mayor victoria. Simón de Cirene fue «obligado» a ayudar pero probablemente fue el hombre más agraciado de todo el trayecto. ¿Cuántas veces Dios nos obliga a ayudar a alguien y lo vivimos como carga, sin ver que es en realidad una gracia extraordinaria?</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Recuerda una carga —física, emocional o espiritual— que llevas hace tiempo, y pide a Jesús, que cargó la cruz por amor, la fuerza para seguir caminando sin quejarte ni dejarte vencer por el cansancio. Ofrece esa carga por alguien que sufre hoy.</div></div>
     </div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="dolorosos-5">
     <div class="card-header"><div class="mystery-number">V</div><div class="card-title-block"><div class="mystery-name">La Crucifixión y Muerte de Jesús en el Calvario</div><div class="mystery-virtue">Virtud a pedir: Conversión y odio al pecado</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Giotto%20-%20Scrovegni%20-%20-35-%20-%20Crucifixion.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, Madre de los Dolores. Ruega por nosotros al contemplar a tu Hijo crucificado y agonizante en el Calvario, mientras Tú, de pie junto a la Cruz, ofrecías con Él el sacrificio de tu corazón partido. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">En el Calvario, Jesús es clavado en la Cruz. Durante tres horas agoniza entre el cielo y la tierra, pronunciando las Siete Palabras. Perdona a sus verdugos, promete el Paraíso al buen ladrón, encomienda a Juan como hijo a su Madre. Al morir, el velo del Templo se rasga de arriba abajo, la tierra tiembla, las rocas se parten. El centurión confiesa: «Verdaderamente este era el Hijo de Dios». La Redención queda consumada.</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Lucas 23, 33–34</div><div class="verse-text">«Y cuando llegaron al lugar llamado de la Calavera, le crucificaron allí, y a los malhechores, uno a la derecha y otro a la izquierda. Y Jesús decía: Padre, perdónalos, porque no saben lo que hacen.»</div></div>
         <div class="verse"><div class="verse-ref">Lucas 23, 43</div><div class="verse-text">«Entonces Jesús le dijo: De cierto te digo que hoy estarás conmigo en el paraíso.»</div></div>
@@ -583,10 +874,13 @@
         <div class="verse"><div class="verse-ref">Juan 19, 30</div><div class="verse-text">«Cuando Jesús hubo tomado el vinagre, dijo: Consumado es. Y habiendo inclinado la cabeza, entregó el espíritu.»</div></div>
         <div class="verse"><div class="verse-ref">Juan 3, 16</div><div class="verse-text">«Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">Jesús crucificado, que al morir en la Cruz consumas nuestra redención y abres las puertas del cielo, concédenos una fe profunda en el poder salvífico de Tu sacrificio. Que la contemplación de Tu Cruz nos llene de un santo horror al pecado que Te causó tal suplicio y de un amor ardiente hacia Ti que tanto nos amaste. Como el buen ladrón, reconozcamos nuestras culpas y clamemos: «Acuérdate de mí cuando llegues a tu Reino.» María, Madre de dolores, únenos a tu ofrenda silenciosa al pie de la Cruz. Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">«Consumado es.» No es el grito del derrotado sino la declaración del vencedor. En la Cruz, Jesús no pierde: gana. Gana a la humanidad para el Padre. Su último aliento es también el primero de la Nueva Creación. Al pie de la Cruz está María, que representa a la Iglesia. Juan, que representa al discípulo amado. Y nosotros. Cada vez que rezamos el Rosario meditando la Crucifixión, estamos junto a ellos en el Calvario, recibiendo el mismo don: Su cuerpo, Su sangre, Su Madre.</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Detente un momento ante la cruz y pregúntate qué pecado concreto necesitas dejar atrás. La muerte de Jesús no fue en vano: pide la gracia de la conversión sincera, no como un sentimiento pasajero, sino como una decisión que cambie un hábito esta semana.</div></div>
     </div>
   </div>
 </div>
@@ -597,107 +891,135 @@
     <div class="group-type">Tercer Grupo</div>
     <div class="group-title">Misterios Gloriosos</div>
     <div class="group-days">📅 Miércoles y Domingos</div>
+
+    <div class="tracker-label">Toca un numeral para ir directo a ese misterio y marcar en cuál vas</div>
+    <div class="decade-tracker" id="tracker-gloriosos"><div class="decade-dot" data-group="gloriosos" data-n="1" title="La Resurrección" onclick="marcarDecena('gloriosos',1)">I</div><div class="decade-dot" data-group="gloriosos" data-n="2" title="La Ascensión" onclick="marcarDecena('gloriosos',2)">II</div><div class="decade-dot" data-group="gloriosos" data-n="3" title="Pentecostés" onclick="marcarDecena('gloriosos',3)">III</div><div class="decade-dot" data-group="gloriosos" data-n="4" title="La Asunción" onclick="marcarDecena('gloriosos',4)">IV</div><div class="decade-dot" data-group="gloriosos" data-n="5" title="La Coronación" onclick="marcarDecena('gloriosos',5)">V</div></div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="gloriosos-1">
     <div class="card-header"><div class="mystery-number">I</div><div class="card-title-block"><div class="mystery-name">La Resurrección de Jesús</div><div class="mystery-virtue">Virtud a pedir: Fe viva y esperanza en la vida eterna</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Giotto%20-%20Scrovegni%20-%20-37-%20-%20Resurrection%20%28Noli%20me%20tangere%29.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, Reina del cielo, alégrate. Tu Hijo, al que viste morir en la Cruz, resucitó glorioso al tercer día. Ruega por nosotros para que nuestra fe en la Resurrección sea firme, viva y nos transforme. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">Al amanecer del tercer día, el sepulcro está vacío. Jesús ha resucitado glorioso e inmortal. Se aparece primero a María Magdalena —llamándola por su nombre—, luego a los discípulos de Emaús en la fracción del pan, y después a los Once con las puertas cerradas, mostrándoles sus llagas. La Resurrección es el fundamento de la fe cristiana: si Cristo no resucitó, vana es nuestra fe. Pero Él resucitó, y con Él resucita nuestra esperanza de la vida eterna.</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Mateo 28, 5–6</div><div class="verse-text">«Mas el ángel respondió y dijo a las mujeres: No temáis vosotras; porque yo sé que buscáis a Jesús, el que fue crucificado. No está aquí, pues ha resucitado, como dijo. Venid, ved el lugar donde fue puesto el Señor.»</div></div>
         <div class="verse"><div class="verse-ref">Juan 20, 19–20</div><div class="verse-text">«Cuando llegó la noche de aquel mismo día, el primero de la semana, estando las puertas cerradas en el lugar donde los discípulos estaban reunidos por miedo de los judíos, vino Jesús, y puesto en medio, les dijo: Paz a vosotros. Y cuando esto dijo, les mostró las manos y el costado. Y los discípulos se regocijaron viendo al Señor.»</div></div>
         <div class="verse"><div class="verse-ref">1 Corintios 15, 20</div><div class="verse-text">«Mas ahora Cristo ha resucitado de los muertos; primicias de los que durmieron es hecho.»</div></div>
         <div class="verse"><div class="verse-ref">Romanos 6, 9</div><div class="verse-text">«Sabiendo que Cristo, habiendo resucitado de los muertos, ya no muere; la muerte no se enseñoreará más de él.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">Señor Jesús Resucitado, que al vencer la muerte abriste para nosotros las puertas de la vida eterna, fortalece nuestra fe en Tu Resurrección. Que la certeza de que Tú vives transforme nuestra manera de enfrentar el sufrimiento, la muerte de seres queridos y nuestros propios temores. Que como los discípulos al verte resucitado, también nosotros nos regocijemos con gozo que nadie nos podrá quitar. Cristo ha resucitado. ¡Verdaderamente ha resucitado! Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">El sepulcro vacío no es solo un hecho histórico; es el corazón de nuestra fe. Un Cristo muerto sería solo un maestro más. Un Cristo resucitado lo cambia todo: cambia el significado del sufrimiento, de la muerte, de la historia. Si Él venció a la muerte, nada —absolutamente nada— puede vencernos a nosotros cuando estamos en Él. ¿Vivimos con esa certeza pascual o seguimos atrapados en los sepulcros del miedo y la desesperanza?</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Si hoy atraviesas una situación que parece sin salida, recuerda que la piedra del sepulcro también parecía definitiva. Pide la gracia de una esperanza activa: no de resignación, sino de la certeza de que Dios puede transformar lo que hoy ves como un final.</div></div>
     </div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="gloriosos-2">
     <div class="card-header"><div class="mystery-number">II</div><div class="card-title-block"><div class="mystery-name">La Ascensión de Jesús a los Cielos</div><div class="mystery-virtue">Virtud a pedir: Deseo de los bienes eternos</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Giotto%20-%20Scrovegni%20-%20-38-%20-%20Ascension.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, Reina de los Apóstoles. Ruega por nosotros al contemplar la Ascensión gloriosa de tu Hijo al cielo, donde lleva nuestra humanidad ante el trono del Padre y desde donde intercede por nosotros eternamente. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">Cuarenta días después de la Resurrección, Jesús reúne a los apóstoles en el Monte de los Olivos. Les da el mandato misionero —«Id por todo el mundo y predicad el Evangelio a toda criatura»— y asciende glorioso a los cielos, donde se sienta a la derecha del Padre. La Ascensión no es una ausencia sino una nueva presencia: Jesús lleva nuestra humanidad al seno de la Trinidad e intercede eternamente por nosotros.</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Hechos 1, 9–11</div><div class="verse-text">«Y habiendo dicho estas cosas, viéndolo ellos, fue alzado, y le recibió una nube que le ocultó de sus ojos. Y estando ellos con los ojos puestos en el cielo, entre tanto que él se iba, he aquí se pusieron junto a ellos dos varones con vestiduras blancas, los cuales también les dijeron: Varones galileos, ¿por qué estáis mirando al cielo? Este mismo Jesús, que ha sido tomado de vosotros al cielo, así vendrá como le habéis visto ir al cielo.»</div></div>
         <div class="verse"><div class="verse-ref">Marcos 16, 19</div><div class="verse-text">«Y el Señor, después que les habló, fue recibido arriba en el cielo, y se sentó a la diestra de Dios.»</div></div>
         <div class="verse"><div class="verse-ref">Juan 14, 2–3</div><div class="verse-text">«En la casa de mi Padre muchas moradas hay; si así no fuera, yo os lo hubiera dicho; voy, pues, a preparar lugar para vosotros. Y si me fuere y os preparare lugar, vendré otra vez, y os tomaré a mí mismo, para que donde yo estoy, vosotros también estéis.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">Señor ascendido a los cielos, que llevas nuestra humanidad ante el trono del Padre, eleva también nuestros corazones hacia las cosas de arriba. Que no nos aferremos demasiado a lo transitorio de este mundo, sino que vivamos orientados hacia la patria celestial que Tú nos preparas. Haznos misioneros que, como los apóstoles, no quedemos paralizados mirando el cielo sino que bajemos a anunciar que Cristo vive y volverá. Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">Jesús «sube» para poder estar más cerca de todos. Desde la derecha del Padre intercede por nosotros sin cesar. La Ascensión nos recuerda que este mundo no es nuestro hogar definitivo. Somos peregrinos. Pero a veces actuamos como si esta vida fuera todo lo que hay, acumulando, apegándonos, olvidando que «aquí no tenemos ciudad permanente» (Heb 13,14). La Ascensión nos invita a vivir como ciudadanos del cielo que todavía pasan por la tierra.</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Eleva tu mirada por un instante hacia las cosas de arriba: ¿qué de lo que hoy te preocupa tanto seguirá importando dentro de cien años? Pide el desapego sano que permite vivir con los pies en la tierra y el corazón puesto en el cielo.</div></div>
     </div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="gloriosos-3">
     <div class="card-header"><div class="mystery-number">III</div><div class="card-title-block"><div class="mystery-name">La Venida del Espíritu Santo en Pentecostés</div><div class="mystery-virtue">Virtud a pedir: Los dones del Espíritu Santo</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Giotto%20-%20Scrovegni%20-%20-39-%20-%20Pentecost.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, Reina de los mártires. Ruega por nosotros al contemplar el glorioso día de Pentecostés, cuando el Espíritu Santo descendió sobre ti y los apóstoles reunidos en el Cenáculo, y nació la Iglesia santa de Dios. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">Reunidos en el Cenáculo con María, los ciento veinte discípulos oran durante diez días. De repente, un viento impetuoso llena la sala y lenguas de fuego se posan sobre cada uno. Todos son llenos del Espíritu Santo y comienzan a hablar en otras lenguas. Pedro, que días antes había negado a Jesús tres veces, predica con valentía apostólica y tres mil personas se convierten en un solo día. Nace la Iglesia visible. El Espíritu sigue actuando hoy.</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Hechos 2, 1–4</div><div class="verse-text">«Cuando llegó el día de Pentecostés, estaban todos unánimes juntos. Y de repente vino del cielo un estruendo como de un viento recio que soplaba, el cual llenó toda la casa donde estaban sentados; y se les aparecieron lenguas repartidas, como de fuego, asentándose sobre cada uno de ellos. Y fueron todos llenos del Espíritu Santo, y comenzaron a hablar en otras lenguas, según el Espíritu les daba que hablasen.»</div></div>
         <div class="verse"><div class="verse-ref">Juan 14, 26</div><div class="verse-text">«Mas el Consolador, el Espíritu Santo, a quien el Padre enviará en mi nombre, él os enseñará todas las cosas, y os recordará todo lo que yo os he dicho.»</div></div>
         <div class="verse"><div class="verse-ref">Hechos 2, 41</div><div class="verse-text">«Así que, los que recibieron su palabra fueron bautizados; y se añadieron aquel día como tres mil personas.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">Ven, Espíritu Santo, llena los corazones de tus fieles y enciende en ellos el fuego de tu amor. Concédenos los dones que necesitamos para vivir como auténticos testigos del Evangelio: sabiduría para discernir, fortaleza para testimoniarlo, consejo para ayudar a otros, y piedad para amarte sobre todas las cosas. Como a los apóstoles en el Cenáculo, renuévanos y envíanos al mundo a proclamar que Cristo vive. María, Reina de los Apóstoles, enséñanos a permanecer en oración hasta que el Espíritu venga. Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">Pentecostés transforma a personas asustadas en testigos valientes. La misma cobardía de Pedro que lo llevó a negar a Jesús tres veces se convierte en un valor indestructible que lo llevará al martirio. El fuego del Espíritu no cambia solo las circunstancias externas; transforma desde dentro. ¿Hemos pedido al Espíritu Santo que transforme también nuestra tibieza en celo, nuestro miedo en valentía, nuestra mediocridad en santidad?</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Pide al Espíritu Santo, con sencillez, uno de sus dones que más necesites hoy —sabiduría para una decisión, fortaleza para un miedo, consejo para ayudar a otro—. El mismo Espíritu que llenó a los Apóstoles está disponible también para ti, ahora.</div></div>
     </div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="gloriosos-4">
     <div class="card-header"><div class="mystery-number">IV</div><div class="card-title-block"><div class="mystery-name">La Asunción de la Virgen María a los Cielos</div><div class="mystery-virtue">Virtud a pedir: Gracia de una buena muerte / Pureza</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Titian%20-%20Assunta%20%28Assumption%20of%20the%20Virgin%29%20-%20WGA22806.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, asunta en cuerpo y alma a la gloria del cielo. Ruega por nosotros al contemplar tu Asunción gloriosa, que es nuestra esperanza y el anticipo de la resurrección de nuestra propia carne al fin de los tiempos. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">Al término de su vida terrena, María, preservada del pecado original y llena de gracia, es llevada en cuerpo y alma a la gloria celestial por voluntad especial de Dios. No experimenta la corrupción del sepulcro porque jamás estuvo unida al pecado, fuente de esa corrupción. La Asunción de María es la anticipación y garantía de la resurrección de nuestra propia carne al final de los tiempos.</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Apocalipsis 12, 1</div><div class="verse-text">«Apareció en el cielo una gran señal: una mujer vestida del sol, con la luna debajo de sus pies, y sobre su cabeza una corona de doce estrellas.»</div></div>
         <div class="verse"><div class="verse-ref">Lucas 1, 48–49</div><div class="verse-text">«Porque ha mirado la humildad de su esclava; pues he aquí que desde ahora me llamarán bienaventurada todas las generaciones, porque el Poderoso ha hecho grandes cosas por mí; y santo es su nombre.»</div></div>
         <div class="verse"><div class="verse-ref">1 Corintios 15, 42–43</div><div class="verse-text">«Así también es la resurrección de los muertos. Se siembra en corrupción, resucitará en incorrupción. Se siembra en deshonra, resucitará en gloria; se siembra en debilidad, resucitará en poder.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">María Asunta al cielo, nuestra Madre y modelo, intercede por nosotros en la hora de nuestra muerte para que, purificados por la misericordia de tu Hijo, podamos también nosotros compartir un día la gloria eterna. Tu Asunción nos recuerda que nuestros cuerpos están llamados a la gloria y no a la corrupción. Enséñanos a cuidar y respetar nuestro cuerpo como templo del Espíritu. En el nombre de Jesús tu Hijo, sé nuestra guía al cielo. Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">La Asunción de María no es solo su privilegio; es nuestra esperanza. Lo que Dios hizo con ella en plenitud, promete hacerlo con todos nosotros al final. Nuestros cuerpos, aunque marchiten y mueran, serán resucitados y glorificados. Esta certeza da sentido al sufrimiento físico, a la enfermedad y a la vejez. No caminamos hacia la nada sino hacia la gloria. María nos precede y nos espera.</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Considera tu propio cuerpo y tu vida como algo destinado a la gloria, no al desecho. Pide a María, asunta en cuerpo y alma, la gracia de cuidar tu salud, tu pureza y tu esperanza con la misma dignidad con que Dios mira a sus hijos.</div></div>
     </div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="gloriosos-5">
     <div class="card-header"><div class="mystery-number">V</div><div class="card-title-block"><div class="mystery-name">La Coronación de María como Reina del Cielo y de la Tierra</div><div class="mystery-virtue">Virtud a pedir: Perseverancia final / Devoción a María</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Diego%20Vel%C3%A1zquez%20-%20The%20Coronation%20of%20the%20Virgin%20-%20WGA24787.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, Reina coronada por la Santísima Trinidad, sentada a la diestra de tu Hijo en la gloria eterna. Intercede por nosotros para que, perseverando fieles hasta el fin, podamos también nosotros compartir contigo la corona de la gloria. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">En el cielo, la Santísima Trinidad corona a María como Reina de los ángeles y de los hombres, de toda la creación visible e invisible. Como Madre del Rey de reyes, recibe el honor supremo que corresponde a su dignidad única entre todas las criaturas. Desde su trono celestial, María intercede sin cesar por todos sus hijos en la tierra, mediando las gracias de su Hijo hacia cada alma que la invoca.</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Apocalipsis 12, 1</div><div class="verse-text">«Apareció en el cielo una gran señal: una mujer vestida del sol, con la luna debajo de sus pies, y sobre su cabeza una corona de doce estrellas.»</div></div>
         <div class="verse"><div class="verse-ref">Lucas 1, 32–33</div><div class="verse-text">«Este será grande, y será llamado Hijo del Altísimo; y el Señor Dios le dará el trono de David su padre; y reinará sobre la casa de Jacob para siempre, y su reino no tendrá fin.»</div></div>
         <div class="verse"><div class="verse-ref">Salmo 45 (44), 10</div><div class="verse-text">«Hijas de reyes están entre tus ilustres; está la reina a tu diestra con oro de Ofir.»</div></div>
         <div class="verse"><div class="verse-ref">Judith 15, 9</div><div class="verse-text">«Tú eres la gloria de Jerusalén, tú eres la alegría de Israel, tú eres el honor de nuestro pueblo.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">Reina del cielo, alégrate, aleluya. El Hijo que mereciste llevar en tu seno, aleluya, resucitó como dijo, aleluya. Ruega a Dios por nosotros, aleluya. María, Reina y Madre nuestra, intercede ante tu Hijo por todos nuestros seres queridos, por los más alejados de Dios, por los moribundos de este momento. Que tu corona de gloria sea también nuestra esperanza de que quienes te siguen fielmente participarán de tu misma gloria eterna. Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">El Rosario termina su ciclo glorioso donde todo el plan de Dios culmina: en el trono de María, Reina y Madre. El Rosario entero es, de alguna manera, un camino desde la Anunciación hasta la Coronación: desde el primer «sí» de María hasta su triunfo eterno. Toda nuestra vida espiritual tiene este mismo arco: comenzamos diciendo «sí» a Dios y esperamos, con la gracia de María, terminar coronados con Él en el cielo. ¿Perseveramos hasta el final?</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Renueva hoy, aunque sea con pocas palabras, tu «sí» a la fe: pedir perseverancia no es pedir sentimientos fuertes, sino la decisión callada de no abandonar a Dios en los días grises. Pide a la Reina del Cielo que te sostenga hasta el final.</div></div>
     </div>
   </div>
 </div>
@@ -708,105 +1030,133 @@
     <div class="group-type">Cuarto Grupo · Instituidos por San Juan Pablo II (2002)</div>
     <div class="group-title">Misterios Luminosos</div>
     <div class="group-days">📅 Jueves</div>
+
+    <div class="tracker-label">Toca un numeral para ir directo a ese misterio y marcar en cuál vas</div>
+    <div class="decade-tracker" id="tracker-luminosos"><div class="decade-dot" data-group="luminosos" data-n="1" title="El Bautismo" onclick="marcarDecena('luminosos',1)">I</div><div class="decade-dot" data-group="luminosos" data-n="2" title="Bodas de Caná" onclick="marcarDecena('luminosos',2)">II</div><div class="decade-dot" data-group="luminosos" data-n="3" title="Anuncio del Reino" onclick="marcarDecena('luminosos',3)">III</div><div class="decade-dot" data-group="luminosos" data-n="4" title="La Transfiguración" onclick="marcarDecena('luminosos',4)">IV</div><div class="decade-dot" data-group="luminosos" data-n="5" title="La Eucaristía" onclick="marcarDecena('luminosos',5)">V</div></div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="luminosos-1">
     <div class="card-header"><div class="mystery-number">I</div><div class="card-title-block"><div class="mystery-name">El Bautismo de Jesús en el Jordán</div><div class="mystery-virtue">Virtud a pedir: Fidelidad al propio bautismo</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Giotto%20-%20Scrovegni%20-%20-23-%20-%20Baptism%20of%20Christ.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, Madre del Cordero de Dios. Ruega por nosotros al contemplar el bautismo de tu Hijo en el Jordán, cuando la voz del Padre lo proclamó Hijo amado y el Espíritu Santo descendió sobre Él en forma de paloma. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">Jesús, el Hijo de Dios sin pecado, baja al Jordán y pide a Juan que lo bautice, cargando simbólicamente con los pecados de la humanidad. Al salir del agua, los cielos se abren, el Espíritu desciende en forma de paloma y la voz del Padre proclama: «Este es mi Hijo amado, en quien me complazco.» La Trinidad se revela plenamente. Jesús inicia su misión pública y santifica el bautismo que nos regenera como hijos de Dios.</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Mateo 3, 13.16–17</div><div class="verse-text">«Entonces Jesús vino de Galilea a Juan al Jordán, para ser bautizado por él... Y Jesús, después que fue bautizado, subió luego del agua; y he aquí los cielos le fueron abiertos, y vio al Espíritu de Dios que descendía como paloma, y venía sobre él. Y hubo una voz de los cielos, que decía: Este es mi Hijo amado, en quien tengo complacencia.»</div></div>
         <div class="verse"><div class="verse-ref">Juan 1, 29</div><div class="verse-text">«El siguiente día vio Juan a Jesús que venía a él, y dijo: He aquí el Cordero de Dios, que quita el pecado del mundo.»</div></div>
         <div class="verse"><div class="verse-ref">Marcos 1, 11</div><div class="verse-text">«Y vino una voz de los cielos que decía: Tú eres mi Hijo amado; en ti tengo complacencia.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">Padre celestial, que en el bautismo de tu Hijo revelaste la Trinidad y santificaste el agua que nos regenera, renueva en nosotros la gracia de nuestro propio bautismo. Que escuchemos siempre Tu voz que nos llama «hijos amados», y que vivamos a la altura de esta dignidad inigualable. Espíritu Santo, paloma que descendiste sobre Jesús en el Jordán, desciende también hoy sobre nuestras almas y renueva en nosotros la filiación divina. Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">En el bautismo de Jesús Dios Padre dice: «Este es mi Hijo amado.» En nuestro bautismo, dice lo mismo de nosotros. Somos hijos de Dios por adopción. Esta es la identidad más profunda del cristiano, anterior a cualquier otro título, rol o función. Todo lo demás pasa; la filiación divina es eterna. ¿Vivimos desde esa identidad o nos dejamos definir por otras cosas más superficiales?</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Recuerda tu propio bautismo —aunque no lo recuerdes con la memoria— y da gracias por ser hijo de Dios. Pide la gracia de vivir hoy una sola acción que sea coherente con esa identidad: una palabra de verdad, un gesto de servicio, una oración sincera.</div></div>
     </div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="luminosos-2">
     <div class="card-header"><div class="mystery-number">II</div><div class="card-title-block"><div class="mystery-name">Las Bodas de Caná: El Primer Milagro de Jesús</div><div class="mystery-virtue">Virtud a pedir: Confianza en la intercesión de María</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Giotto%20-%20Scrovegni%20-%20-24-%20-%20Marriage%20at%20Cana.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, mediadora de todas las gracias. Ruega por nosotros al contemplar tu intercesión en Caná, donde tu palabra bastó para que tu Hijo adelantara su hora y obrara el primer milagro. Lleva hoy ante Él nuestras necesidades más profundas. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">En una boda en Caná de Galilea, el vino se acaba y María intercede ante su Hijo. Jesús responde: «¿Qué tengo yo contigo, mujer? Aún no ha llegado mi hora.» Sin embargo, María —confiando perfectamente en su Hijo— dice a los sirvientes: «Haced todo lo que él os dijere.» Jesús transforma el agua en vino excelente, el «principio de sus señales». El milagro manifiesta la gloria de Jesús, la eficacia de la intercesión de María y la importancia de la obediencia a Cristo.</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Juan 2, 3–5</div><div class="verse-text">«Y faltando el vino, la madre de Jesús le dijo: No tienen vino. Jesús le dijo: ¿Qué tienes conmigo, mujer? Aún no ha venido mi hora. Su madre dijo a los que servían: Haced todo lo que él os dijere.»</div></div>
         <div class="verse"><div class="verse-ref">Juan 2, 7–11</div><div class="verse-text">«Jesús les dijo: Llenad estas tinajas de agua. Y las llenaron hasta arriba. Entonces les dijo: Sacad ahora, y llevadlo al maestresala. Y lo llevaron. Cuando el maestresala probó el agua hecha vino, sin saber él de dónde era (aunque lo sabían los sirvientes que habían sacado el agua), el maestresala llamó al esposo, y le dijo: Todo hombre sirve primero el buen vino, y cuando ya han bebido mucho, entonces el inferior; mas tú has reservado el buen vino hasta ahora. Este principio de señales hizo Jesús en Caná de Galilea, y manifestó su gloria; y sus discípulos creyeron en él.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">María, Madre de la divina gracia, que en Caná intercediste ante tu Hijo por una necesidad tan simple como el vino de una boda, ¡cuánto más intercederás por nuestras necesidades más profundas! Lleva hoy ante Jesús nuestras carencias: las de nuestro hogar, de nuestra familia, de nuestra alma. Y dinos también a nosotros lo que dijiste a los sirvientes: «Haced todo lo que él os dijere.» Que obedezcamos siempre a tu Hijo y experimentemos el milagro de su gracia en nuestra vida. Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">«Haced todo lo que él os dijere.» Esta es la síntesis perfecta del papel de María: no atrae la atención sobre sí misma sino que la redirige siempre hacia Jesús. La mejor devoción mariana es la que nos lleva más cerca de Cristo. ¿Usamos a María como fin o como camino? Y los sirvientes que obedecen —llenando de agua las tinajas sin saber que será vino— son imagen de nuestra fe: hacer lo que Dios pide aunque aún no entendamos el resultado.</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Si tienes una necesidad que sientes que «no tiene remedio», acude a María como en Caná: «no tienen vino». No hace falta una oración elaborada; basta presentarle la situación con confianza y dejar el resto en manos de Jesús.</div></div>
     </div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="luminosos-3">
     <div class="card-header"><div class="mystery-number">III</div><div class="card-title-block"><div class="mystery-name">El Anuncio del Reino de Dios y la Llamada a la Conversión</div><div class="mystery-virtue">Virtud a pedir: Apertura a la Palabra de Dios / Conversión</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/James%20Tissot%20-%20The%20Sermon%20of%20the%20Beatitudes%20-%20Brooklyn%20Museum.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, Madre del Evangelio vivo. Ruega por nosotros al contemplar la predicación del Reino de Dios por tu Hijo Jesús, que recorrió pueblos y ciudades anunciando la salvación y llamando a la conversión. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">Durante su vida pública, Jesús recorre ciudades y aldeas anunciando el Evangelio del Reino de Dios, llamando a la conversión, perdonando pecadores, sanando enfermos y liberando a los oprimidos por el mal. Sus parábolas abren el misterio del Reino: la semilla que cae en buena tierra, el hijo pródigo que regresa al Padre, los talentos, el buen samaritano. El núcleo de su mensaje es: «Arrepentíos, porque el Reino de los cielos se ha acercado.»</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Marcos 1, 14–15</div><div class="verse-text">«Después que Juan fue encarcelado, Jesús vino a Galilea predicando el evangelio del reino de Dios, diciendo: El tiempo se ha cumplido, y el reino de Dios se ha acercado; arrepentíos, y creed en el evangelio.»</div></div>
         <div class="verse"><div class="verse-ref">Lucas 4, 18</div><div class="verse-text">«El Espíritu del Señor está sobre mí, por cuanto me ha ungido para dar buenas nuevas a los pobres; me ha enviado a sanar a los quebrantados de corazón; a pregonar libertad a los cautivos, y vista a los ciegos; a poner en libertad a los oprimidos.»</div></div>
         <div class="verse"><div class="verse-ref">Lucas 15, 7</div><div class="verse-text">«Os digo que así habrá más gozo en el cielo por un pecador que se arrepiente, que por noventa y nueve justos que no necesitan de arrepentimiento.»</div></div>
         <div class="verse"><div class="verse-ref">Mateo 5, 3</div><div class="verse-text">«Bienaventurados los pobres en espíritu, porque de ellos es el reino de los cielos.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">Señor Jesús, Evangelizador del Padre, que pasaste por el mundo haciendo el bien y anunciando el Reino, convierte hoy nuestros corazones. Que Tu Palabra no resbale sobre nosotros como semilla en el camino pedregoso, sino que eche raíces profundas y produzca fruto abundante. Danos la valentía de la conversión sincera: cambiar no solo las costumbres externas sino las actitudes más hondas del corazón. Y haznos a su vez anunciadores de Tu Reino en nuestro entorno. Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">Jesús no anuncia solo una doctrina; anuncia una Persona: el Padre que viene al encuentro del hijo pródigo. La conversión cristiana no es primariamente moralismo —mejorar la conducta— sino un encuentro: volver al Padre. ¿Cuánto tiempo ha pasado desde nuestra última conversión sincera? El Evangelio no es solo para los que están lejos de Dios; interpela también a los «buenos» que a veces necesitamos la mayor conversión.</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Escucha hoy una palabra del Evangelio como si fuera dirigida personalmente a ti, y pregúntate qué cambio concreto te pide. La conversión no es un sentimiento, sino una dirección distinta para una decisión de hoy.</div></div>
     </div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="luminosos-4">
     <div class="card-header"><div class="mystery-number">IV</div><div class="card-title-block"><div class="mystery-name">La Transfiguración de Jesús en el Monte Tabor</div><div class="mystery-virtue">Virtud a pedir: Anhelo de santidad / Contemplación</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Raphael%20-%20Transfiguration%20-%20WGA18804.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, espejo de la luz divina. Ruega por nosotros al contemplar la Transfiguración de tu Hijo en el Monte Tabor, cuando su gloria divina resplandeció ante los apóstoles como anticipo de su victoria pascual. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">Jesús lleva a Pedro, Santiago y Juan al monte Tabor. Ante ellos se transfigura: su rostro resplandece como el sol y su ropa se vuelve blanca como la luz, más brillante que ningún blanqueador de la tierra podría hacerla. Aparecen Moisés y Elías hablando con Él sobre su «éxodo» que iba a cumplir en Jerusalén. La voz del Padre proclama desde la nube: «Este es mi Hijo amado; a Él oíd.» Por un instante los apóstoles contemplan la gloria divina que Jesús vela habitualmente bajo su humanidad.</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Mateo 17, 1–3.5</div><div class="verse-text">«Seis días después, Jesús tomó a Pedro, a Jacobo y a Juan su hermano, y los llevó aparte a un monte alto; y se transfiguró delante de ellos, y resplandeció su rostro como el sol, y sus vestidos se hicieron blancos como la luz. Y he aquí les aparecieron Moisés y Elías, hablando con él... He aquí una voz que decía desde la nube: Este es mi Hijo amado, en quien tengo complacencia; a él oíd.»</div></div>
         <div class="verse"><div class="verse-ref">2 Pedro 1, 16–17</div><div class="verse-text">«Porque no os hemos dado a conocer el poder y la venida de nuestro Señor Jesucristo siguiendo fábulas artificiosas, sino como habiendo visto con nuestros propios ojos su majestad. Pues cuando él recibió de Dios Padre honra y gloria, le fue enviada desde la magnífica gloria una voz que decía: Este es mi Hijo amado, en el cual tengo complacencia.»</div></div>
         <div class="verse"><div class="verse-ref">2 Corintios 3, 18</div><div class="verse-text">«Por tanto, nosotros todos, mirando a cara descubierta como en un espejo la gloria del Señor, somos transformados de gloria en gloria en la misma imagen, como por el Espíritu del Señor.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">Señor Jesús transfigurado, que revelaste tu gloria en el Tabor para fortalecer la fe de tus discípulos antes de la Pasión, concédenos también a nosotros momentos de luz interior que nos sostengan en las horas oscuras. Que la contemplación de Tu belleza divina encienda en nuestros corazones el deseo de la santidad. Como Pedro, quisiéramos quedarnos siempre en el Tabor de Tu presencia; enséñanos, no obstante, a bajar luego al valle del servicio cotidiano, llevando en el alma la luz de Tu gloria. Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">La Transfiguración nos dice que la gloria ya está presente en Jesús, solo que velada. Y del mismo modo, la gloria está ya presente en el cristiano en estado de gracia, solo que velada por la fragilidad humana. «Somos transfigurados de gloria en gloria» (2 Cor 3,18). La vida espiritual es ese proceso de transfiguración progresiva. Cada sacramento, cada oración sincera, cada acto de amor nos va transformando más en la imagen de Cristo.</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Busca, aunque sea cinco minutos, un momento de silencio real —sin pantallas ni ruido— para «subir al monte» con Jesús. La santidad no se improvisa en medio del bullicio; necesita, como los Apóstoles, momentos apartados para ver con claridad.</div></div>
     </div>
   </div>
 
-  <div class="mystery-card">
+  <div class="mystery-card" id="luminosos-5">
     <div class="card-header"><div class="mystery-number">V</div><div class="card-title-block"><div class="mystery-name">La Institución de la Eucaristía en la Última Cena</div><div class="mystery-virtue">Virtud a pedir: Amor a la Eucaristía / Adoración</div></div></div>
+    <div class="mystery-image"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Giotto%20-%20Scrovegni%20-%20-29-%20-%20Last%20Supper.jpg" alt="" loading="lazy" onerror="this.closest('.mystery-image').style.display='none'"></div>
     <div class="card-body">
       <div class="section-label">El Pésame a María</div>
       <div class="pesame-block"><div class="pesame-text">Yo te saludo, María, Madre del Sacerdote eterno. Ruega por nosotros al contemplar la Última Cena, donde tu Hijo instituyó la Eucaristía y el sacerdocio, dejándonos el don más grande: su Cuerpo, su Sangre, su Alma y su Divinidad bajo el velo del pan y del vino. Amén.</div></div>
-      <div class="section-label">Explicación del Misterio</div>
+      <details class="toggle-block"><summary class="section-label">Explicación del Misterio</summary>
       <div class="explanation">En el Cenáculo de Jerusalén, la noche antes de su Pasión, Jesús celebra la Última Cena con los apóstoles. Toma el pan, da gracias, lo parte y dice: «Esto es mi Cuerpo, que por vosotros es dado.» Toma el cáliz y dice: «Esta es mi Sangre del nuevo pacto, que por muchos es derramada para remisión de los pecados.» Instituye así la Eucaristía y el sacerdocio ministerial. «Haced esto en conmemoración mía.» La Misa no es un simple memorial sino la actualización sacramental del mismo sacrificio del Calvario.</div>
-      <div class="section-label">Versículos de la Sagrada Escritura (STR)</div>
+      </details>
+      <details class="toggle-block"><summary class="section-label">Versículos de la Sagrada Escritura (STR)</summary>
       <div class="verses-block">
         <div class="verse"><div class="verse-ref">Mateo 26, 26–28</div><div class="verse-text">«Y mientras comían, tomó Jesús el pan, y lo bendijo, y lo partió, y dio a sus discípulos, y dijo: Tomad, comed; esto es mi cuerpo. Y tomando el vaso, y habiendo dado gracias, les dio, diciendo: Bebed de él todos; porque esto es mi sangre del nuevo pacto, que por muchos es derramada para remisión de los pecados.»</div></div>
         <div class="verse"><div class="verse-ref">Juan 6, 51</div><div class="verse-text">«Yo soy el pan vivo que descendió del cielo; si alguno comiere de este pan, vivirá para siempre; y el pan que yo daré es mi carne, la cual yo daré por la vida del mundo.»</div></div>
         <div class="verse"><div class="verse-ref">Lucas 22, 19–20</div><div class="verse-text">«Y tomó el pan y dio gracias, y lo partió, y les dio, diciendo: Esto es mi cuerpo, que por vosotros es dado; haced esto en memoria de mí. De igual manera, después que hubo cenado, tomó la copa, diciendo: Esta copa es el nuevo pacto en mi sangre, que por vosotros se derrama.»</div></div>
       </div>
+      </details>
       <div class="section-label">Plegaria</div>
       <div class="prayer-block"><div class="prayer-text">Señor Jesús, que en la Última Cena nos dejaste el don incomparable de Tu Cuerpo y Tu Sangre en la Eucaristía, concédenos una fe más profunda en Tu presencia real en el Santísimo Sacramento. Que nunca nos acerquemos a la Comunión por costumbre o rutina, sino con el amor, la preparación y el agradecimiento que merece recibirte a Ti. Que cada Misa sea para nosotros un auténtico encuentro con Tu persona viva y resucitada. Jesús Eucarístico, te adoro, te amo y te agradezco. Amén.</div></div>
-      <div class="section-label">Reflexión</div>
+      <details class="toggle-block"><summary class="section-label">Reflexión</summary>
       <div class="reflection-block"><div class="reflection-text">La Eucaristía es el «testamento» de Cristo: antes de morir, nos deja lo más precioso que tiene, a Sí mismo. No un símbolo, no un recuerdo, sino Su propio Cuerpo y Sangre. «El pan que yo daré es mi carne, la cual yo daré por la vida del mundo.» La Misa es el Calvario hecho presente: el mismo sacrificio, la misma víctima, el mismo sacerdote. ¿Cómo participamos en la Misa? ¿Con fe viva o con distracción? La calidad de nuestra vida espiritual depende en gran medida de cómo nos relacionamos con la Eucaristía.</div></div>
+      </details>
+      <div class="fruit-block"><div class="fruit-label">Fruto para la vida diaria</div><div class="fruit-text">Si puedes, participa hoy o esta semana de la Eucaristía con mayor atención, o haz una breve visita al Santísimo. Pide la gracia de no dar por costumbre lo que es, en realidad, el mayor regalo: Dios mismo entregándose por amor.</div></div>
     </div>
   </div>
 </div>
@@ -832,6 +1182,27 @@
         <div class="oracion-nombre">Salve Regina</div>
         <div class="oracion-texto">Dios te salve, Reina y Madre de misericordia, vida, dulzura y esperanza nuestra; Dios te salve. A ti llamamos los desterrados hijos de Eva; a ti suspiramos gimiendo y llorando en este valle de lágrimas. Ea, pues, Señora, abogada nuestra, vuelve a nosotros esos tus ojos misericordiosos; y después de este destierro, muéstranos a Jesús, fruto bendito de tu vientre. ¡Oh clemente, oh piadosa, oh dulce siempre Virgen María!</div>
         <div class="oracion-nota">V. Ruega por nosotros, Santa Madre de Dios. R. Para que seamos dignos de alcanzar las promesas de Nuestro Señor Jesucristo. Amén.</div>
+        <span class="latin-toggle" onclick="toggleLatin(this)">🕯 Ver en latín</span>
+        <div class="latin-text">Salve, Regina, Mater misericordiae, vita, dulcedo, et spes nostra, salve. Ad te clamamus, exsules filii Evae. Ad te suspiramus, gementes et flentes in hac lacrimarum valle. Eia ergo, advocata nostra, illos tuos misericordes oculos ad nos converte. Et Iesum, benedictum fructum ventris tui, nobis post hoc exsilium ostende. O clemens, O pia, O dulcis Virgo Maria.<br><br>V. Ora pro nobis, sancta Dei Genetrix. R. Ut digni efficiamur promissionibus Christi. Amen.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rosario-fin">
+    <div class="intro-header">
+      <div class="intro-icon">🕊</div>
+      <div>
+        <div class="intro-title">Bajo tu Amparo (Sub Tuum Praesidium)</div>
+        <div class="intro-subtitle">La oración mariana más antigua conocida · s. III</div>
+      </div>
+    </div>
+    <div class="intro-body">
+      <div class="oracion-item">
+        <div class="oracion-nombre">Bajo tu Amparo</div>
+        <div class="oracion-texto">Bajo tu amparo nos acogemos, Santa Madre de Dios; no desprecies las súplicas que te dirigimos en nuestras necesidades, antes líbranos de todo peligro, ¡oh siempre Virgen, gloriosa y bendita!</div>
+        <div class="oracion-nota">Hallada en un papiro egipcio del siglo III, es testimonio de que los primeros cristianos ya acudían a María como Madre y protectora en los momentos difíciles. Puede rezarse, además de al final del Rosario, en cualquier momento de angustia o necesidad.</div>
+        <span class="latin-toggle" onclick="toggleLatin(this)">🕯 Ver en latín</span>
+        <div class="latin-text">Sub tuum praesidium confugimus, Sancta Dei Genetrix. Nostras deprecationes ne despicias in necessitatibus nostris, sed a periculis cunctis libera nos semper, Virgo gloriosa et benedicta.</div>
       </div>
     </div>
   </div>
@@ -934,6 +1305,46 @@ Cordero de Dios, que quitas el pecado del mundo, <em>ten misericordia de nosotro
   </div>
 </div>
 
+
+<!-- PROMESAS DE MARÍA -->
+<div id="promesas" class="mystery-group">
+  <div class="group-header">
+    <div class="group-type">Tradición Mariana</div>
+    <div class="group-title">Las 15 Promesas de la Virgen María</div>
+    <div class="group-days">A quienes recen devotamente el Santo Rosario · atribuidas a Santo Domingo de Guzmán y al Beato Alano de la Roca</div>
+  </div>
+
+  <div class="rosario-intro">
+    <div class="intro-header">
+      <div class="intro-icon">🤍</div>
+      <div>
+        <div class="intro-title">Promesas reveladas por Nuestra Señora</div>
+        <div class="intro-subtitle">Para quienes recen el Rosario con devoción y constancia</div>
+      </div>
+    </div>
+    <div class="intro-body">
+      <div class="promise-list">
+        <div class="promise-item"><div class="promise-num"></div><div class="promise-text">A todos aquellos que recen mi Rosario con devoción, les daré gracias especiales.</div></div>
+        <div class="promise-item"><div class="promise-num"></div><div class="promise-text">Prometo mi especial protección y las mayores gracias a todos aquellos que reciten el Rosario.</div></div>
+        <div class="promise-item"><div class="promise-num"></div><div class="promise-text">El Rosario será un arma poderosísima contra el infierno; destruirá los vicios, librará del pecado y disipará las herejías.</div></div>
+        <div class="promise-item"><div class="promise-num"></div><div class="promise-text">Hará florecer las virtudes y las buenas obras; obtendrá para las almas la abundante misericordia de Dios; apartará los corazones del amor al mundo y sus vanidades, elevándolos al deseo de las cosas eternas. ¡Cuántas almas se santificarán por este medio!</div></div>
+        <div class="promise-item"><div class="promise-num"></div><div class="promise-text">Las almas que me encomienden por el Rosario no perecerán.</div></div>
+        <div class="promise-item"><div class="promise-num"></div><div class="promise-text">El que rece mi Rosario con devoción, considerando sus misterios, no será vencido por la desgracia. Dios no lo castigará en su justicia, no perecerá de mala muerte; si es pecador se convertirá, si es justo perseverará en la gracia y llegará a la vida eterna.</div></div>
+        <div class="promise-item"><div class="promise-num"></div><div class="promise-text">Los que tengan verdadera devoción al Rosario no morirán sin los sacramentos de la Iglesia.</div></div>
+        <div class="promise-item"><div class="promise-num"></div><div class="promise-text">Los que recen el Rosario hallarán durante su vida y en su muerte la luz de Dios, la plenitud de sus gracias y participarán de los méritos de los bienaventurados.</div></div>
+        <div class="promise-item"><div class="promise-num"></div><div class="promise-text">Libraré muy pronto del purgatorio a las almas devotas del Rosario.</div></div>
+        <div class="promise-item"><div class="promise-num"></div><div class="promise-text">Los verdaderos hijos de mi Rosario gozarán de una gran gloria en el cielo.</div></div>
+        <div class="promise-item"><div class="promise-num"></div><div class="promise-text">Todo lo que se pida con el Rosario se obtendrá.</div></div>
+        <div class="promise-item"><div class="promise-num"></div><div class="promise-text">A los que propaguen mi Rosario los ayudaré en sus necesidades.</div></div>
+        <div class="promise-item"><div class="promise-num"></div><div class="promise-text">He obtenido de mi Hijo que todos los miembros de la Cofradía del Rosario tengan por hermanos a los santos del cielo durante su vida y en el momento de la muerte.</div></div>
+        <div class="promise-item"><div class="promise-num"></div><div class="promise-text">Los que recen mi Rosario fielmente son todos hijos míos muy amados, hermanos y hermanas de Jesucristo, mi único Hijo.</div></div>
+        <div class="promise-item"><div class="promise-num"></div><div class="promise-text">La devoción a mi Rosario es una señal grande de predestinación para la gloria eterna.</div></div>
+      </div>
+      <div class="oracion-nota" style="margin-top:18px;">Estas promesas se transmiten desde antiguo en la tradición de la devoción al Rosario, vinculadas a la predicación de Santo Domingo de Guzmán y a la difusión del Beato Alano de la Roca en el siglo XV. La Iglesia las propone como expresión de la confianza filial en la intercesión de María, no como fórmulas mágicas: su fruto pleno se da en quien reza con fe, humildad y vida coherente con el Evangelio.</div>
+    </div>
+  </div>
+</div>
+
 </div><!-- end main -->
 
 <div class="footer">
@@ -944,18 +1355,131 @@ Cordero de Dios, que quitas el pecado del mundo, <em>ten misericordia de nosotro
   </div>
   <p>«El Rosario es el compendio de todo el Evangelio.» — San Pablo VI</p>
   <p>«Nadie que haya rezado el Rosario con fervor y perseverancia se ha condenado.» — San Alfonso María de Ligorio</p>
-  <div class="source-note">Versículos: Sagrada Biblia · Versión STR (Mons. Juan Straubinger) · © Editorial La Merced, PAGINA WEB HECHA POR KEVIN ARIZ</div>
+  <div class="source-note">Versículos: Sagrada Biblia · Versión STR (Mons. Juan Straubinger) · © Editorial La Merced</div>
+  <div class="source-note">Hecho con fe y dedicación por Kevin Oscar Ariz ✙</div>
   <span class="footer-cross">✙</span>
 </div>
 
 <script>
-  function showGroup(id) {
+  function showGroup(id, el) {
     document.querySelectorAll('.mystery-group').forEach(g => g.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    event.target.classList.add('active');
+    const target = el || (typeof event !== 'undefined' ? event.target : null);
+    const tab = document.querySelector('.tab-btn[data-group="' + id + '"]') || target;
+    if (tab) tab.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
+  /* ---- Modo Oración / Lectura Nocturna ---- */
+  function toggleModoOracion() {
+    document.body.classList.toggle('modo-oracion');
+    const on = document.body.classList.contains('modo-oracion');
+    document.getElementById('btnOracion').classList.toggle('on', on);
+    localStorage.setItem('rosario_modoOracion', on ? '1' : '0');
+  }
+
+  /* ---- Contador de Avemarías ---- */
+  let aveCount = parseInt(localStorage.getItem('rosario_aveCount') || '0', 10);
+  function pintarAve() { document.getElementById('aveCount').textContent = aveCount; }
+  function cambiarAve(delta) {
+    if (delta === 0) { aveCount = 0; }
+    else { aveCount = Math.max(0, aveCount + delta); }
+    localStorage.setItem('rosario_aveCount', aveCount);
+    pintarAve();
+  }
+
+  /* ---- Tracker de decenas (en qué misterio voy) ---- */
+  function marcarDecena(grupo, n) {
+    localStorage.setItem('rosario_decena_' + grupo, n);
+    pintarDecenas(grupo);
+    const card = document.getElementById(grupo + '-' + n);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      card.classList.add('highlight-jump');
+      setTimeout(() => card.classList.remove('highlight-jump'), 1400);
+    }
+  }
+  function pintarDecenas(grupo) {
+    const guardado = localStorage.getItem('rosario_decena_' + grupo);
+    document.querySelectorAll('#tracker-' + grupo + ' .decade-dot').forEach(dot => {
+      dot.classList.toggle('current', guardado && dot.dataset.n === guardado);
+    });
+  }
+
+  /* ---- Expandir / Contraer todos los desplegables ---- */
+  function toggleExpandAll() {
+    const detalles = document.querySelectorAll('details.toggle-block');
+    const algunoAbierto = Array.from(detalles).some(d => d.open);
+    const abrirTodo = !algunoAbierto;
+    detalles.forEach(d => d.open = abrirTodo);
+    document.getElementById('btnExpand').textContent = abrirTodo ? '⤡ Contraer Todo' : '⤢ Expandir Todo';
+    document.getElementById('btnExpand').classList.toggle('on', abrirTodo);
+  }
+
+  /* ---- Oraciones en Latín ---- */
+  function toggleLatin(btn) {
+    const latinDiv = btn.nextElementSibling;
+    latinDiv.classList.toggle('show');
+    btn.textContent = latinDiv.classList.contains('show') ? '✕ Ocultar latín' : '🕯 Ver en latín';
+  }
+
+  /* ---- Tamaño de letra ---- */
+  const fontLevels = ['', 'font-lg', 'font-xl'];
+  let fontLevel = parseInt(localStorage.getItem('rosario_fontLevel') || '0', 10);
+  function aplicarFuente() {
+    document.documentElement.classList.remove('font-lg', 'font-xl');
+    if (fontLevels[fontLevel]) document.documentElement.classList.add(fontLevels[fontLevel]);
+    localStorage.setItem('rosario_fontLevel', fontLevel);
+  }
+  function cambiarFuente(delta) {
+    if (delta === 0) { fontLevel = 0; }
+    else { fontLevel = Math.min(fontLevels.length - 1, Math.max(0, fontLevel + delta)); }
+    aplicarFuente();
+  }
+
+  /* ---- Misterios de hoy, según el día de la semana ---- */
+  const misteriosPorDia = {
+    0: { id: 'gloriosos', nombre: 'Gloriosos', emoji: '☀' }, // domingo
+    1: { id: 'gozosos',   nombre: 'Gozosos',   emoji: '🌸' }, // lunes
+    2: { id: 'dolorosos', nombre: 'Dolorosos', emoji: '✝'  }, // martes
+    3: { id: 'gloriosos', nombre: 'Gloriosos', emoji: '☀' }, // miércoles
+    4: { id: 'luminosos', nombre: 'Luminosos', emoji: '✦'  }, // jueves
+    5: { id: 'dolorosos', nombre: 'Dolorosos', emoji: '✝'  }, // viernes
+    6: { id: 'gozosos',   nombre: 'Gozosos',   emoji: '🌸' }, // sábado
+  };
+  function pintarBannerHoy() {
+    const dia = new Date().getDay();
+    const m = misteriosPorDia[dia];
+    const banner = document.getElementById('todayBanner');
+    banner.innerHTML =
+      `<div class="tb-text">Hoy corresponden los <strong>Misterios ${m.nombre}</strong> ${m.emoji}. ` +
+      `Pulsa para ir directo a la meditación de hoy.</div>` +
+      `<button onclick="showGroup('${m.id}', this)">Rezar los ${m.nombre} de hoy</button>`;
+    const tab = document.querySelector('.tab-btn[data-group="' + m.id + '"]');
+    if (tab) tab.classList.add('today-mark');
+  }
+
+  /* ---- Botón volver arriba ---- */
+  function initScrollTop() {
+    const btn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => {
+      btn.classList.toggle('show', window.scrollY > 400);
+    });
+  }
+
+  /* ---- Inicialización ---- */
+  window.addEventListener('DOMContentLoaded', () => {
+    pintarAve();
+    ['gozosos','dolorosos','gloriosos','luminosos'].forEach(pintarDecenas);
+    if (localStorage.getItem('rosario_modoOracion') === '1') {
+      document.body.classList.add('modo-oracion');
+      document.getElementById('btnOracion').classList.add('on');
+    }
+    aplicarFuente();
+    pintarBannerHoy();
+    initScrollTop();
+  });
 </script>
 </body>
 </html>
